@@ -9,8 +9,6 @@ var MAX_ROOMS_COUNT = 5;
 var MAX_GUESTS_IN_ROOMS = 3;
 var LOCATION_Y_MIN = 130;
 var LOCATION_Y_MAX = 630;
-var MAP_MIN_X = 0;
-var MAP_MAX_X = 1200;
 var NUMBER_ESTATE_OBJECTS = 8;
 
 var EstateTitles = ['Большая уютная квартира', 'Маленькая неуютная квартира', 'Огромный прекрасный дворец', 'Маленький ужасный дворец', 'Красивый гостевой домик', 'Некрасивый негостеприимный домик', 'Уютное бунгало далеко от моря', 'Неуютное бунгало по колено в воде'];
@@ -69,7 +67,7 @@ var getOneStringFromMassive = function (massive, endItem) {
 };
 
 var getRandomEstateObject = function (numberEstateOblect) {
-  var locationX = getLocationXOrY(MAP_MIN_X, MAP_MAX_X);
+  var locationX = getLocationXOrY(mapMinX, mapMaxX);
   var locationY = getLocationXOrY(LOCATION_Y_MIN, LOCATION_Y_MAX);
   var countRooms = getRandomMinMax(MIN_ROOMS_COUNT, MAX_ROOMS_COUNT);
 
@@ -107,17 +105,23 @@ var estateObjects = [];
 
 var fragment = document.createDocumentFragment();
 var templatePin = document.querySelector('#pin').content;
+var insertPlace = document.querySelector('.map__pins');
+var pinWidth = getComputedStyle(templatePin.querySelector('.map__pin')).width;
+var mapMaxX = insertPlace.clientWidth - parseInt(pinWidth, 10);
+var mapMinX = 0 + parseInt(pinWidth, 10);
 for (var i = 0; i < NUMBER_ESTATE_OBJECTS; i++) {
-  estateObjects[i] = getRandomEstateObject(i);
   var newMapPin = templatePin.cloneNode(true);
   var firstTag = newMapPin.querySelector('.map__pin');
-  firstTag.style = 'left: ' + estateObjects[i].location.x + 'px; top: ' + estateObjects[i].location.y + 'px;';
   var secondTag = newMapPin.querySelector('img');
+
+  estateObjects[i] = getRandomEstateObject(i);
+  firstTag.style = 'left: ' + estateObjects[i].location.x + 'px; top: ' + estateObjects[i].location.y + 'px;';
+
   secondTag.src = estateObjects[i].author.avatar;
   secondTag.alt = estateObjects[i].offer.title;
   fragment.appendChild(newMapPin);
 }
-var insertPlace = document.querySelector('.map__pins');
+
 insertPlace.appendChild(fragment);
 
 var fragmentCard = document.createDocumentFragment();
