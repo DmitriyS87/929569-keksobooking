@@ -10,6 +10,7 @@ var MAX_GUESTS_IN_ROOMS = 3;
 var LOCATION_Y_MIN = 130;
 var LOCATION_Y_MAX = 630;
 var NUMBER_ESTATE_OBJECTS = 8;
+var DEFAULT_CARD_INDEX = 0;
 
 var EstateTitles = ['Большая уютная квартира', 'Маленькая неуютная квартира', 'Огромный прекрасный дворец', 'Маленький ужасный дворец', 'Красивый гостевой домик', 'Некрасивый негостеприимный домик', 'Уютное бунгало далеко от моря', 'Неуютное бунгало по колено в воде'];
 var EstateTypes = ['palace', 'flat', 'house', 'bungalo'];
@@ -98,91 +99,97 @@ var getRandomEstateObject = function (numberEstateOblect) {
   return makedEstateOgj;
 };
 
-var avatarsSequenceIndex = getMassiveSequence(AUTHORS_COUNT);
-var avatarsRandomSequenceIndex = getMassiveRandomSequence(avatarsSequenceIndex);
-var estateTitlesIndex = getMassiveRandomSequence(EstateTitles);
-var estateObjects = [];
-
-var fragment = document.createDocumentFragment();
-var templatePin = document.querySelector('#pin').content;
-var insertPlace = document.querySelector('.map__pins');
-var pinWidth = getComputedStyle(templatePin.querySelector('.map__pin')).width;
-var mapMaxX = insertPlace.clientWidth - parseInt(pinWidth, 10);
-var mapMinX = 0 + parseInt(pinWidth, 10);
-for (var i = 0; i < NUMBER_ESTATE_OBJECTS; i++) {
+var getNewPin = function (estateObject) {
+  // var templatePin = document.querySelector('#pin').content;
   var newMapPin = templatePin.cloneNode(true);
   var firstTag = newMapPin.querySelector('.map__pin');
   var secondTag = newMapPin.querySelector('img');
+  firstTag.style = 'left: ' + estateObject.location.x + 'px; top: ' + estateObject.location.y + 'px;';
 
+  secondTag.src = estateObject.author.avatar;
+  secondTag.alt = estateObject.offer.title;
+  return newMapPin;
+};
+
+
+var getEstateTypeTranslate = function (currentObject) {
+  switch (currentObject.offer.type) {
+    case 'flat':
+      return 'Квартира';
+    case 'bungalo':
+      return 'Бунгало';
+    case 'house':
+      return 'Дом';
+    case 'palace':
+      return 'Дворец';
+    default:
+      return 'Шалаш';
+  }
+};
+
+var pushCardData = function (currentObject) {
+  var newCard = templateCard.cloneNode(true);
+
+  newCard.querySelector('.popup__title').textContent = currentObject.offer.title;
+  newCard.querySelector('.popup__text--address').textContent = currentObject.offer.address;
+  newCard.querySelector('.popup__text--price').textContent = currentObject.offer.price + '₽/ночь';
+  newCard.querySelector('.popup__type').textContent = getEstateTypeTranslate(currentObject);
+
+  var roomsText = 'ы';
+  if (currentObject.offer.rooms < 2) {
+    roomsText = 'а';
+  } else if (currentObject.offer.rooms > 4) {
+    roomsText = '';
+  }
+  var guestsText = 'ей';
+  if (currentObject.offer.guests < 2) {
+    guestsText = 'я';
+  }
+
+  newCard.querySelector('.popup__text--capacity').textContent = currentObject.offer.rooms + ' комнат' + roomsText + ' для ' + currentObject.offer.guests + ' гост' + guestsText + '.';
+  newCard.querySelector('.popup__text--time').textContent = 'Заезд после ' + currentObject.offer.checkin + ', выезд до ' + currentObject.offer.checkout + '.';
+
+  var featuresLi = newCard.querySelectorAll('.popup__features li');
+  for (var j = 0; j < currentObject.offer.features.length; j++) {
+    featuresLi[j].textContent = currentObject.offer.features;
+  }
+
+  newCard.querySelector('.popup__description').textContent = currentObject.offer.description;
+  var estatePhotosDiv = newCard.querySelector('.popup__photos');
+  var estateOfferPictures = newCard.querySelector('.popup__photos img');
+  estateOfferPictures.src = currentObject.offer.photos[0];
+  for (var index = 1; index < currentObject.offer.photos.length; index++) {
+    var currentImgClone = estateOfferPictures.cloneNode(true);
+    currentImgClone.src = currentObject.offer.photos[index];
+    estatePhotosDiv.appendChild(currentImgClone);
+  }
+  newCard.querySelector('.popup__avatar').src = currentObject.author.avatar;
+  return newCard;
+};
+
+var avatarsSequenceIndex = getMassiveSequence(AUTHORS_COUNT);
+var avatarsRandomSequenceIndex = getMassiveRandomSequence(avatarsSequenceIndex);
+var estateTitlesIndex = getMassiveRandomSequence(EstateTitles);
+
+var estateObjects = [];
+
+var fragmentPin = document.createDocumentFragment();
+var insertPlacePin = document.querySelector('.map__pins');
+var templatePin = document.querySelector('#pin').content;
+var pinTemplateWidth = getComputedStyle(templatePin.querySelector('.map__pin')).width;
+var mapMaxX = insertPlacePin.clientWidth - parseInt(pinTemplateWidth, 10);
+var mapMinX = 0 + parseInt(pinTemplateWidth, 10);
+
+for (var i = 0; i < NUMBER_ESTATE_OBJECTS; i++) {
   estateObjects[i] = getRandomEstateObject(i);
-  firstTag.style = 'left: ' + estateObjects[i].location.x + 'px; top: ' + estateObjects[i].location.y + 'px;';
-
-  secondTag.src = estateObjects[i].author.avatar;
-  secondTag.alt = estateObjects[i].offer.title;
-  fragment.appendChild(newMapPin);
+  fragmentPin.appendChild(getNewPin(estateObjects[i]));
 }
-
-insertPlace.appendChild(fragment);
+insertPlacePin.appendChild(fragmentPin);
 
 var fragmentCard = document.createDocumentFragment();
 var templateCard = document.querySelector('#card').content;
-var firstIndex = 0;
 
-var newCard = templateCard.cloneNode(true);
-var popupTitle = newCard.querySelector('.popup__title');
-popupTitle.textContent = estateObjects[firstIndex].offer.title;
-newCard.querySelector('.popup__text--address').textContent = estateObjects[firstIndex].offer.address;
-newCard.querySelector('.popup__text--price').textContent = estateObjects[firstIndex].offer.price + '₽/ночь';
-
-var estateTypeTranslate = '';
-switch (estateObjects[firstIndex].offer.type) {
-  case 'flat':
-    estateTypeTranslate = 'Квартира';
-    break;
-  case 'bungalo':
-    estateTypeTranslate = 'Бунгало';
-    break;
-  case 'house':
-    estateTypeTranslate = 'Дом';
-    break;
-  case 'palace':
-    estateTypeTranslate = 'Дворец';
-    break;
-  default:
-    estateTypeTranslate = 'Шалаш';
-
-}
-newCard.querySelector('.popup__type').textContent = estateTypeTranslate;
-var roomsText = 'ы';
-if (estateObjects[firstIndex].offer.rooms < 2) {
-  roomsText = 'а';
-} else if (estateObjects[firstIndex].offer.rooms > 4) {
-  roomsText = '';
-}
-var guestsText = 'ей';
-if (estateObjects[firstIndex].offer.guests < 2) {
-  guestsText = 'я';
-}
-
-newCard.querySelector('.popup__text--capacity').textContent = estateObjects[firstIndex].offer.rooms + ' комнат' + roomsText + ' для ' + estateObjects[firstIndex].offer.guests + ' гост' + guestsText + '.';
-newCard.querySelector('.popup__text--time').textContent = 'Заезд после ' + estateObjects[firstIndex].offer.checkin + ', выезд до ' + estateObjects[firstIndex].offer.checkout + '.';
-var featuresLi = newCard.querySelectorAll('.popup__features li');
-
-for (var j = 0; j < estateObjects[firstIndex].offer.features.length; j++) {
-  featuresLi[j].textContent = estateObjects[firstIndex].offer.features;
-
-}
-newCard.querySelector('.popup__description').textContent = estateObjects[firstIndex].offer.description;
-var estatePhotosDiv = newCard.querySelector('.popup__photos');
-var estateOfferPictures = newCard.querySelector('.popup__photos img');
-estateOfferPictures.src = estateObjects[firstIndex].offer.photos[0];
-for (var index = 1; index < estateObjects[firstIndex].offer.photos.length; index++) {
-  var currentImgClone = estateOfferPictures.cloneNode(true);
-  currentImgClone.src = estateObjects[firstIndex].offer.photos[index];
-  estatePhotosDiv.appendChild(currentImgClone);
-}
-newCard.querySelector('.popup__avatar').src = estateObjects[firstIndex].author.avatar;
-fragmentCard.appendChild(newCard);
+fragmentCard.appendChild(pushCardData(estateObjects[DEFAULT_CARD_INDEX]));
 var insertPlaceCard = document.querySelector('.map');
 var beforeDOMItem = document.querySelector('.map__filters-container');
 insertPlaceCard.insertBefore(fragmentCard, beforeDOMItem);
