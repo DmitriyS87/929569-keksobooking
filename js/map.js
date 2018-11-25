@@ -66,6 +66,10 @@ var cropArray = function (massive, endItem) {
   return outputMassive;
 };
 
+var getRandomItem = function (array) {
+  return array[getRandomMinMax(0, array - 1)];
+};
+
 var getRandomEstateObject = function (numberEstateOblect) {
   var locationX = getLocationXOrY(mapMinX, mapMaxX);
   var locationY = getLocationXOrY(LOCATION_Y_MIN, LOCATION_Y_MAX);
@@ -78,11 +82,11 @@ var getRandomEstateObject = function (numberEstateOblect) {
       title: ESTATE_TITLES[estateTitlesIndex[numberEstateOblect]],
       address: [locationX, locationY],
       price: getRandomMinMax(MIN_PRICE_UNIT, MAX_PRICE_UNIT),
-      type: ESTATE_TYPES[getRandomMinMax(0, ESTATE_TYPES.length - 1)],
+      type: getRandomItem(ESTATE_TYPES),
       rooms: countRooms,
       guests: getRandomMinMax(1, (countRooms * MAX_GUESTS_IN_ROOMS)),
-      checkin: CHECK_IN_OUT_VARIANTS[getRandomMinMax(0, CHECK_IN_OUT_VARIANTS.length - 1)],
-      checkout: CHECK_IN_OUT_VARIANTS[getRandomMinMax(0, CHECK_IN_OUT_VARIANTS.length - 1)],
+      checkin: getRandomItem(CHECK_IN_OUT_VARIANTS),
+      checkout: getRandomItem(CHECK_IN_OUT_VARIANTS),
       features: cropArray(FEATURES_VARIANTS, getRandomMinMax(0, FEATURES_VARIANTS.length)),
       description: '',
       photos: getArrayPhotos(EstatePhotos)
