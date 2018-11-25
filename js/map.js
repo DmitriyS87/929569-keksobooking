@@ -71,7 +71,7 @@ var getRandomItem = function (array) {
 };
 
 var getRandomEstateObject = function (numberEstateOblect) {
-  var locationX = getLocationXOrY(mapMinX, mapMaxX);
+  var locationX = getLocationXOrY(MinMaxXMapPin[0], MinMaxXMapPin[1]);
   var locationY = getLocationXOrY(LOCATION_Y_MIN, LOCATION_Y_MAX);
   var countRooms = getRandomMinMax(MIN_ROOMS_COUNT, MAX_ROOMS_COUNT);
 
@@ -102,19 +102,6 @@ var getRandomEstateObject = function (numberEstateOblect) {
   return makedEstateOgj;
 };
 
-var getNewPin = function (estateObject) {
-  // var templatePin = document.querySelector('#pin').content;
-  var newMapPin = templatePin.cloneNode(true);
-  var firstTag = newMapPin.querySelector('.map__pin');
-  var secondTag = newMapPin.querySelector('img');
-  firstTag.style = 'left: ' + estateObject.location.x + 'px; top: ' + estateObject.location.y + 'px;';
-
-  secondTag.src = estateObject.author.avatar;
-  secondTag.alt = estateObject.offer.title;
-  return newMapPin;
-};
-
-
 var getEstateTypeTranslate = function (currentObject) {
   switch (currentObject.offer.type) {
     case 'flat':
@@ -128,6 +115,35 @@ var getEstateTypeTranslate = function (currentObject) {
     default:
       return 'Шалаш';
   }
+};
+
+var getMaxXPin = function () {
+  var insertPlacePin = document.querySelector('.map__pins');
+  var templatePin = document.querySelector('#pin').content;
+  var pinTemplateWidth = getComputedStyle(templatePin.querySelector('.map__pin')).width;
+  var mapMaxX = insertPlacePin.clientWidth - parseInt(pinTemplateWidth, 10);
+  var mapMinX = 0 + parseInt(pinTemplateWidth, 10);
+  return [mapMinX, mapMaxX];
+};
+
+var getNewPin = function (estateObject, template) {
+  var newMapPin = template.cloneNode(true);
+  var firstTag = newMapPin.querySelector('.map__pin');
+  var secondTag = newMapPin.querySelector('img');
+  firstTag.style = 'left: ' + estateObject.location.x + 'px; top: ' + estateObject.location.y + 'px;';
+  secondTag.src = estateObject.author.avatar;
+  secondTag.alt = estateObject.offer.title;
+  return newMapPin;
+};
+
+var pushNewPinsToMap = function (massiveObjects) {
+  var fragmentPin = document.createDocumentFragment();
+  var insertPlacePin = document.querySelector('.map__pins');
+  var templatePin = document.querySelector('#pin').content;
+  for (var i = 0; i < massiveObjects.length; i++) {
+    fragmentPin.appendChild(getNewPin(massiveObjects[i], templatePin));
+  }
+  insertPlacePin.appendChild(fragmentPin);
 };
 
 var pushCardData = function (currentObject) {
@@ -172,22 +188,17 @@ var pushCardData = function (currentObject) {
 
 var avatarsSequenceIndex = getArraySequence(AUTHORS_COUNT);
 var avatarsRandomSequenceIndex = getArrayRandomSequence(avatarsSequenceIndex);
+
 var estateTitlesIndex = getArrayRandomSequence(ESTATE_TITLES);
 
+var MinMaxXMapPin = getMaxXPin();
+
 var estateObjects = [];
-
-var fragmentPin = document.createDocumentFragment();
-var insertPlacePin = document.querySelector('.map__pins');
-var templatePin = document.querySelector('#pin').content;
-var pinTemplateWidth = getComputedStyle(templatePin.querySelector('.map__pin')).width;
-var mapMaxX = insertPlacePin.clientWidth - parseInt(pinTemplateWidth, 10);
-var mapMinX = 0 + parseInt(pinTemplateWidth, 10);
-
 for (var i = 0; i < NUMBER_ESTATE_OBJECTS; i++) {
   estateObjects.push(getRandomEstateObject(i));
-  fragmentPin.appendChild(getNewPin(estateObjects[i]));
 }
-insertPlacePin.appendChild(fragmentPin);
+
+pushNewPinsToMap(estateObjects);
 
 var fragmentCard = document.createDocumentFragment();
 var templateCard = document.querySelector('#card').content;
