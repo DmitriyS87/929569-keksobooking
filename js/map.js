@@ -67,7 +67,7 @@ var cropArray = function (massive, endItem) {
 };
 
 var getRandomItem = function (array) {
-  return array[getRandomMinMax(0, array - 1)];
+  return array[getRandomMinMax(0, array.length - 1)];
 };
 
 var getRandomEstateObject = function (numberEstateOblect) {
