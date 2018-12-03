@@ -15,6 +15,7 @@ var ESTATE_TYPES = ['palace', 'flat', 'house', 'bungalo'];
 var CHECK_IN_OUT_VARIANTS = ['12:00', '13:00', '14:00'];
 var FEATURES_VARIANTS = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
 // var ESC_CODE = '27';
+var MOVE_SENSIVITY = 3;
 
 var EstatePhotos = ['http://o0.github.io/assets/images/tokyo/hotel1.jpg', 'http://o0.github.io/assets/images/tokyo/hotel2.jpg', 'http://o0.github.io/assets/images/tokyo/hotel3.jpg'];
 
@@ -130,7 +131,7 @@ var getMaxXPin = function () {
   var templatePin = document.querySelector('#pin').content;
   var pinTemplateWidth = getComputedStyle(templatePin.querySelector('.map__pin')).width;
   var mapMaxX = insertPlacePin.clientWidth - parseInt(pinTemplateWidth, 10);
-  var mapMinX = 0 + parseInt(pinTemplateWidth, 10);
+  var mapMinX = 0;
   return [mapMinX, mapMaxX];
 };
 
@@ -343,7 +344,7 @@ var activateForm = function () {
       hideElement(popupCard);
       showedCard = false;
     }
-    setTimeout(getAdressDefault(), 5000);
+    setTimeout(getAdressDefault(), 0);
     mainPinPoint.addEventListener('mouseup', getMapObjects);
   };
 
@@ -400,14 +401,14 @@ var activateForm = function () {
 
 };
 
-var deleteMsg = function (documentObj) {
+var deleteDOMObj = function (documentObj) {
   documentObj.remove();
 
 };
 
 var removeClickListner = function () {
   document.removeEventListener('click', function () {
-    deleteMsg(sendMessage);
+    deleteDOMObj(sendMessage);
     removeClickListner();
   });
 };
@@ -457,13 +458,12 @@ var putLocationAddress = function (address) {
   document.querySelector('#address').value = address;
 };
 
-var getMapObjects = function (evt) {
-  putLocationAddress([evt.clientX, evt.clientY]);
+var getMapObjects = function (location) {
   if (firstInit) {
+    putLocationAddress(location);
     addHiddenCard();
     cross = popupCard.querySelector('.popup__close');
     pushPinsToMap(estateObjects);
-    // firstInit = false;
   } else {
     showPins();
   }
@@ -509,4 +509,99 @@ var mainPinPoint = document.querySelector('.map__pin--main');
 disableForm();
 getAdressDefault();
 
-mainPinPoint.addEventListener('mouseup', getMapObjects);
+var movingObject = {};
+var defaultPosition = {};
+var mapBlock = document.querySelector('.map--faded');
+var nomoveFlag = true;
+
+movingObject.mapMinX = MinMaxXMapPin[0];
+movingObject.mapMaxX = MinMaxXMapPin[1];
+
+movingObject.mapMinY = LOCATION_Y_MIN;
+movingObject.mapMaxY = LOCATION_Y_MAX;
+
+var pictureMousedownHandler = function (evt) {
+
+  movingObject.downX = evt.clientX;
+  movingObject.downY = evt.clientY;
+
+  document.addEventListener('mousemove', clonePinMousemoveHandler);
+  document.addEventListener('mouseup', mainPinMouseupHandler);
+};
+
+mainPinPoint.addEventListener('mousedown', pictureMousedownHandler);
+
+var clonePinMousemoveHandler = function (evt) {
+
+  if (!movingObject.avatar) {
+
+    var moveX = evt.clientX - movingObject.downX;
+    var moveY = evt.clientY - movingObject.downY;
+    if (Math.abs(moveX) < MOVE_SENSIVITY && Math.abs(moveY) < MOVE_SENSIVITY) {
+      return;
+    } else {
+      nomoveFlag = false;
+    }
+
+    movingObject.avatar = mainPinPoint.cloneNode(true);
+    mainPinPoint.classList.add('hidden');
+
+    defaultPosition.x = parseInt(getComputedStyle(mainPinPoint).left, 10);
+    defaultPosition.y = parseInt(getComputedStyle(mainPinPoint).top, 10);
+
+    movingObject.shiftX = movingObject.downX - defaultPosition.x;
+    movingObject.shiftY = movingObject.downY - defaultPosition.y;
+
+    mapBlock.appendChild(movingObject.avatar);
+
+    movingObject.avatar.style.zIndex = 9999;
+    movingObject.avatar.style.position = 'absolute';
+  }
+
+  moveX = evt.clientX - movingObject.shiftX;
+  moveY = evt.clientY - movingObject.shiftY;
+  if (moveX > movingObject.mapMaxX) {
+    moveX = movingObject.mapMaxX;
+  }
+  if (moveX < movingObject.mapMinX) {
+    moveX = movingObject.mapMinX;
+  }
+  if (moveY > movingObject.mapMaxY) {
+    moveY = movingObject.mapMaxY;
+  }
+  if (moveY < movingObject.mapMinY) {
+    moveY = movingObject.mapMinY;
+  }
+
+
+  movingObject.avatar.style.left = moveX + 'px';
+  movingObject.avatar.style.top = moveY + 'px';
+
+  movingObject.upX = moveX;
+  movingObject.upY = moveY;
+
+  putLocationAddress([moveX, moveY]);
+
+
+};
+
+var mainPinMouseupHandler = function (evt) {
+  if (movingObject.avatar) {
+    mainPinPoint.style.left = movingObject.avatar.style.left;
+    mainPinPoint.style.top = movingObject.avatar.style.top;
+    movingObject.avatar.remove();
+    mainPinPoint.classList.remove('hidden');
+
+    if (firstInit) {
+      getMapObjects([evt.clientX, evt.clientY]);
+    }
+  }
+  if (nomoveFlag) {
+    putLocationAddress([evt.clientX, evt.clientY]);
+  }
+
+  document.removeEventListener('mousemove', clonePinMousemoveHandler);
+  movingObject.avatar = '';
+
+};
+
