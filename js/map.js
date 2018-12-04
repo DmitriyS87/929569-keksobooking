@@ -10,8 +10,8 @@ var MAX_GUESTS_IN_ROOMS = 3;
 var LOCATION_Y_MIN = 130;
 var LOCATION_Y_MAX = 630;
 var LOCATION_X_MIN = 0;
-var MAIN_PIN_DEFAULT_LEFT = '570px';
-var MAIN_PIN_DEFAULT_TOP = '375px';
+var MAIN_PIN_DEFAULT_LEFT = 570;
+var MAIN_PIN_DEFAULT_TOP = 375;
 var PIN_WIDTH = 50;
 var NUMBER_ESTATE_OBJECTS = 8;
 var ESTATE_TITLES = ['Большая уютная квартира', 'Маленькая неуютная квартира', 'Огромный прекрасный дворец', 'Маленький ужасный дворец', 'Красивый гостевой домик', 'Некрасивый негостеприимный домик', 'Уютное бунгало далеко от моря', 'Неуютное бунгало по колено в воде'];
@@ -364,8 +364,8 @@ var activateForm = function () {
       showedCard = false;
     }
     setTimeout(getAdressDefault(), 0);
-    mainPinPoint.style.left = MAIN_PIN_DEFAULT_LEFT;
-    mainPinPoint.style.top = MAIN_PIN_DEFAULT_TOP;
+    mainPinPoint.style.left = MAIN_PIN_DEFAULT_LEFT + 'px';
+    mainPinPoint.style.top = MAIN_PIN_DEFAULT_TOP + 'px';
     getAdressDefault();
 
   };
@@ -517,32 +517,29 @@ var mainPinPoint = document.querySelector('.map__pin--main');
 disableForm();
 getAdressDefault();
 
-var movingObject = {};
+
 var defaultPosition = {};
 // var mapBlock = document.querySelector('.map--faded');
-var nomoveFlag = true;
 
-movingObject.mapMinX = LOCATION_X_MIN;
-movingObject.mapMaxX = MaxXMapPin;
-
-movingObject.mapMinY = LOCATION_Y_MIN;
-movingObject.mapMaxY = LOCATION_Y_MAX;
 
 var mainPinMousedownHandler = function (evt) {
+
+  var movingObject = {};
+  var isDragged = true;
 
   movingObject.downX = evt.clientX;
   movingObject.downY = evt.clientY;
 
   var mainPinMousemoveHandler = function (evtMove) {
 
-    if (nomoveFlag) {
+    if (isDragged) {
 
       var moveX = evtMove.clientX - movingObject.downX;
       var moveY = evtMove.clientY - movingObject.downY;
       if (Math.abs(moveX) < MOVE_SENSIVITY && Math.abs(moveY) < MOVE_SENSIVITY) {
         return;
       } else {
-        nomoveFlag = false;
+        isDragged = false;
       }
 
       defaultPosition.x = parseInt(getComputedStyle(mainPinPoint).left, 10);
@@ -557,17 +554,17 @@ var mainPinMousedownHandler = function (evt) {
 
     moveX = evtMove.clientX - movingObject.shiftX;
     moveY = evtMove.clientY - movingObject.shiftY;
-    if (moveX > movingObject.mapMaxX) {
-      moveX = movingObject.mapMaxX;
+    if (moveX > MaxXMapPin) {
+      moveX = MaxXMapPin;
     }
-    if (moveX < movingObject.mapMinX) {
-      moveX = movingObject.mapMinX;
+    if (moveX < LOCATION_X_MIN) {
+      moveX = LOCATION_X_MIN;
     }
-    if (moveY > movingObject.mapMaxY) {
-      moveY = movingObject.mapMaxY;
+    if (moveY > LOCATION_Y_MAX) {
+      moveY = LOCATION_Y_MAX;
     }
-    if (moveY < movingObject.mapMinY) {
-      moveY = movingObject.mapMinY;
+    if (moveY < LOCATION_Y_MIN) {
+      moveY = LOCATION_Y_MIN;
     }
 
 
@@ -586,7 +583,7 @@ var mainPinMousedownHandler = function (evt) {
 
 
   var mainPinMouseupHandler = function (evtUp) {
-    if (!nomoveFlag) {
+    if (!isDragged) {
       mainPinPoint.style.left = movingObject.upX;
       mainPinPoint.style.top = movingObject.upY;
 
@@ -594,7 +591,7 @@ var mainPinMousedownHandler = function (evt) {
         getMapObjects([evtUp.clientX, evtUp.clientY]); // проверить координаты носика точки, вероятно нужна корректировка
       }
     }
-    if (nomoveFlag) {
+    if (isDragged) {
       putLocationAddress([evtUp.clientX, evtUp.clientY]); // проверить координаты носика точки, вероятно нужна корректировка
     }
 
