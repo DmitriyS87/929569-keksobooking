@@ -532,22 +532,22 @@ var mainPinMousedownHandler = function (evt) {
     y: parseInt(getComputedStyle(mainPinPoint).top, 10)
   };
 
-  var movingObject = {
+  var downUpCords = {
     downX: evt.clientX,
     downY: evt.clientY,
   };
 
-  var diffCordsPoint = {
-    shiftX: movingObject.downX - defaultPosition.x,
-    shiftY: movingObject.downY - defaultPosition.y
+  var differenceCords = {
+    shiftX: downUpCords.downX - defaultPosition.x,
+    shiftY: downUpCords.downY - defaultPosition.y
   };
 
   var mainPinMousemoveHandler = function (evtMove) {
 
     if (isDragged) {
 
-      var moveX = evtMove.clientX - movingObject.downX;
-      var moveY = evtMove.clientY - movingObject.downY;
+      var moveX = evtMove.clientX - downUpCords.downX;
+      var moveY = evtMove.clientY - downUpCords.downY;
       if (Math.abs(moveX) < MOVE_SENSIVITY && Math.abs(moveY) < MOVE_SENSIVITY) {
         return;
       } else {
@@ -558,8 +558,8 @@ var mainPinMousedownHandler = function (evt) {
       mainPinPoint.style.position = 'absolute'; // to mainPin
     }
 
-    moveX = evtMove.clientX - diffCordsPoint.shiftX;
-    moveY = evtMove.clientY - diffCordsPoint.shiftY;
+    moveX = evtMove.clientX - differenceCords.shiftX;
+    moveY = evtMove.clientY - differenceCords.shiftY;
     if (moveX > MaxXMapPin) {
       moveX = MaxXMapPin;
     }
@@ -577,8 +577,8 @@ var mainPinMousedownHandler = function (evt) {
     mainPinPoint.style.left = moveX + 'px';
     mainPinPoint.style.top = moveY + 'px';
 
-    movingObject.upX = moveX;
-    movingObject.upY = moveY;
+    downUpCords.upX = moveX;
+    downUpCords.upY = moveY;
 
     putLocationAddress([moveX, moveY]);
 
@@ -590,8 +590,8 @@ var mainPinMousedownHandler = function (evt) {
 
   var mainPinMouseupHandler = function (evtUp) {
     if (!isDragged) {
-      mainPinPoint.style.left = movingObject.upX;
-      mainPinPoint.style.top = movingObject.upY;
+      mainPinPoint.style.left = downUpCords.upX;
+      mainPinPoint.style.top = downUpCords.upY;
 
       if (!formStatus) {
         getMapObjects([evtUp.clientX, evtUp.clientY]); // проверить координаты носика точки, вероятно нужна корректировка
