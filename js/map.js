@@ -9,17 +9,22 @@ var MAX_ROOMS_COUNT = 5;
 var MAX_GUESTS_IN_ROOMS = 3;
 var LOCATION_Y_MIN = 130;
 var LOCATION_Y_MAX = 630;
+var LOCATION_X_MIN = 0;
+var MAIN_PIN_DEFAULT_LEFT = 570;
+var MAIN_PIN_DEFAULT_TOP = 375;
+var PIN_WIDTH = 50;
 var NUMBER_ESTATE_OBJECTS = 8;
 var ESTATE_TITLES = ['Большая уютная квартира', 'Маленькая неуютная квартира', 'Огромный прекрасный дворец', 'Маленький ужасный дворец', 'Красивый гостевой домик', 'Некрасивый негостеприимный домик', 'Уютное бунгало далеко от моря', 'Неуютное бунгало по колено в воде'];
 var ESTATE_TYPES = ['palace', 'flat', 'house', 'bungalo'];
 var CHECK_IN_OUT_VARIANTS = ['12:00', '13:00', '14:00'];
 var FEATURES_VARIANTS = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
 // var ESC_CODE = '27';
+var MOVE_SENSIVITY = 3;
 
 var EstatePhotos = ['http://o0.github.io/assets/images/tokyo/hotel1.jpg', 'http://o0.github.io/assets/images/tokyo/hotel2.jpg', 'http://o0.github.io/assets/images/tokyo/hotel3.jpg'];
 
 var firstInit = true;
-var formStatus = true;
+var formStatus = false;
 var showedCard = false;
 var popupCard;
 var pinsOnMap;
@@ -79,7 +84,7 @@ var getRandomItem = function (array) {
 };
 
 var getRandomEstateObject = function (numberEstateOblect) {
-  var locationX = getLocationXOrY(MinMaxXMapPin[0], MinMaxXMapPin[1]);
+  var locationX = getLocationXOrY(LOCATION_X_MIN, MaxXMapPin);
   var locationY = getLocationXOrY(LOCATION_Y_MIN, LOCATION_Y_MAX);
   var countRooms = getRandomMinMax(MIN_ROOMS_COUNT, MAX_ROOMS_COUNT);
 
@@ -127,18 +132,16 @@ var getEstateTypeTranslate = function (currentObject) {
 
 var getMaxXPin = function () {
   var insertPlacePin = document.querySelector('.map__pins');
-  var templatePin = document.querySelector('#pin').content;
-  var pinTemplateWidth = getComputedStyle(templatePin.querySelector('.map__pin')).width;
-  var mapMaxX = insertPlacePin.clientWidth - parseInt(pinTemplateWidth, 10);
-  var mapMinX = 0 + parseInt(pinTemplateWidth, 10);
-  return [mapMinX, mapMaxX];
+  var mapMaxX = parseInt(insertPlacePin.clientWidth, 10) - PIN_WIDTH;
+  return mapMaxX;
 };
 
 var getNewPin = function (estateObject, template, number) {
   var newMapPin = template.cloneNode(true);
   var firstTag = newMapPin.querySelector('.map__pin');
   var secondTag = newMapPin.querySelector('img');
-  firstTag.style = 'left: ' + estateObject.location.x + 'px; top: ' + estateObject.location.y + 'px;';
+  var styleText = 'left:' + estateObject.location.x + 'px; top:' + estateObject.location.y + 'px;';
+  firstTag.style.cssText = styleText;
   firstTag.setAttribute('name', 'pin' + number);
   secondTag.src = estateObject.author.avatar;
   secondTag.alt = estateObject.offer.title;
@@ -153,6 +156,7 @@ var pushPinsToMap = function (massiveObjects) {
     fragmentPin.appendChild(getNewPin(massiveObjects[i], templatePin, i));
   }
   insertPlacePin.appendChild(fragmentPin);
+  // firstInit = false;
 };
 
 var slicePinId = function (name) {
@@ -318,6 +322,22 @@ var activateForm = function () {
     var submitElement = document.querySelector('.ad-form__submit');
     var resetElement = document.querySelector('.ad-form__reset');
 
+    var submitData = function (evt) {
+      evt.preventDefault();
+      /*    for (var i = 0; i < formElement.elements.length; i++) {
+        formElement.elements[i].validity
+      }
+
+      if (evt.callback === 'sucess') {
+        viewSendMessage();
+      }
+      if (evt.callback === 'error') {
+        viewErrorMessage();
+      }
+      */
+      return false;
+    };
+    submitElement.addEventListener('click', submitData);
   }
 
   var hideMapPins = function () {
@@ -343,25 +363,14 @@ var activateForm = function () {
       hideElement(popupCard);
       showedCard = false;
     }
-    setTimeout(getAdressDefault(), 5000);
-    mainPinPoint.addEventListener('mouseup', getMapObjects);
+    setTimeout(getAdressDefault(), 0);
+    mainPinPoint.style.left = MAIN_PIN_DEFAULT_LEFT + 'px';
+    mainPinPoint.style.top = MAIN_PIN_DEFAULT_TOP + 'px';
+    getAdressDefault();
+
   };
 
-  var submitData = function (evt) {
-    evt.preventDefault();
-    /*    for (var i = 0; i < formElement.elements.length; i++) {
-      formElement.elements[i].validity
-    }
 
-    if (evt.callback === 'sucess') {
-      viewSendMessage();
-    }
-    if (evt.callback === 'error') {
-      viewErrorMessage();
-    }
-    */
-    return false;
-  };
   /*
   var viewSendMessage = function () {
     var sendMessageTemplate = document.querySelector('#success').content;
@@ -389,7 +398,7 @@ var activateForm = function () {
   };
   target="_blank"
  */
-  submitElement.addEventListener('click', submitData);
+
   resetElement.addEventListener('click', setDefaultPage);
   var formElement = document.querySelector('.ad-form');
   formElement.addEventListener('reset', getAdressDefault);
@@ -400,14 +409,14 @@ var activateForm = function () {
 
 };
 
-var deleteMsg = function (documentObj) {
+var deleteDOMObj = function (documentObj) {
   documentObj.remove();
 
 };
 
 var removeClickListner = function () {
   document.removeEventListener('click', function () {
-    deleteMsg(sendMessage);
+    deleteDOMObj(sendMessage);
     removeClickListner();
   });
 };
@@ -452,18 +461,17 @@ var getAdressDefault = function () {
 };
 
 var putLocationAddress = function (address) {
-  address[0] += MinMaxXMapPin[0];
+  address[0] += LOCATION_X_MIN;
   address[1] += LOCATION_Y_MIN;
   document.querySelector('#address').value = address;
 };
 
-var getMapObjects = function (evt) {
-  putLocationAddress([evt.clientX, evt.clientY]);
+var getMapObjects = function (location) {
   if (firstInit) {
+    putLocationAddress(location);
     addHiddenCard();
     cross = popupCard.querySelector('.popup__close');
     pushPinsToMap(estateObjects);
-    // firstInit = false;
   } else {
     showPins();
   }
@@ -497,7 +505,7 @@ var addHiddenCard = function () {
 var avatarsSequenceIndex = getArraySequence(AUTHORS_COUNT);
 var avatarsRandomSequenceIndex = getArrayRandomSequence(avatarsSequenceIndex);
 var estateTitlesIndex = getArrayRandomSequence(ESTATE_TITLES);
-var MinMaxXMapPin = getMaxXPin();
+var MaxXMapPin = getMaxXPin();
 
 var estateObjects = [];
 for (var i = 0; i < NUMBER_ESTATE_OBJECTS; i++) {
@@ -509,4 +517,97 @@ var mainPinPoint = document.querySelector('.map__pin--main');
 disableForm();
 getAdressDefault();
 
-mainPinPoint.addEventListener('mouseup', getMapObjects);
+
+var defaultPosition = {};
+// var mapBlock = document.querySelector('.map--faded');
+
+
+var mainPinMousedownHandler = function (evt) {
+
+  var isDragged = true;
+
+
+  defaultPosition = {
+    x: parseInt(getComputedStyle(mainPinPoint).left, 10),
+    y: parseInt(getComputedStyle(mainPinPoint).top, 10)
+  };
+
+  var downUpCords = {
+    downX: evt.clientX,
+    downY: evt.clientY,
+  };
+
+  var differenceCords = {
+    shiftX: downUpCords.downX - defaultPosition.x,
+    shiftY: downUpCords.downY - defaultPosition.y
+  };
+
+  var mainPinMousemoveHandler = function (evtMove) {
+
+    if (isDragged) {
+
+      var moveX = evtMove.clientX - downUpCords.downX;
+      var moveY = evtMove.clientY - downUpCords.downY;
+      if (Math.abs(moveX) < MOVE_SENSIVITY && Math.abs(moveY) < MOVE_SENSIVITY) {
+        return;
+      } else {
+        isDragged = false;
+      }
+
+      mainPinPoint.style.zIndex = 9999; // to mainPin
+      mainPinPoint.style.position = 'absolute'; // to mainPin
+    }
+
+    moveX = evtMove.clientX - differenceCords.shiftX;
+    moveY = evtMove.clientY - differenceCords.shiftY;
+    if (moveX > MaxXMapPin) {
+      moveX = MaxXMapPin;
+    }
+    if (moveX < LOCATION_X_MIN) {
+      moveX = LOCATION_X_MIN;
+    }
+    if (moveY > LOCATION_Y_MAX) {
+      moveY = LOCATION_Y_MAX;
+    }
+    if (moveY < LOCATION_Y_MIN) {
+      moveY = LOCATION_Y_MIN;
+    }
+
+
+    mainPinPoint.style.left = moveX + 'px';
+    mainPinPoint.style.top = moveY + 'px';
+
+    downUpCords.upX = moveX;
+    downUpCords.upY = moveY;
+
+    putLocationAddress([moveX, moveY]);
+
+
+  };
+
+  document.addEventListener('mousemove', mainPinMousemoveHandler);
+
+
+  var mainPinMouseupHandler = function (evtUp) {
+    if (!isDragged) {
+      mainPinPoint.style.left = downUpCords.upX;
+      mainPinPoint.style.top = downUpCords.upY;
+
+      if (!formStatus) {
+        getMapObjects([evtUp.clientX, evtUp.clientY]); // проверить координаты носика точки, вероятно нужна корректировка
+      }
+    }
+    if (isDragged) {
+      putLocationAddress([evtUp.clientX, evtUp.clientY]); // проверить координаты носика точки, вероятно нужна корректировка
+    }
+
+    document.removeEventListener('mousemove', mainPinMousemoveHandler);
+
+  };
+
+  document.addEventListener('mouseup', mainPinMouseupHandler);
+};
+
+mainPinPoint.addEventListener('mousedown', mainPinMousedownHandler);
+
+
