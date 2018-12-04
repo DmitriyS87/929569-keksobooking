@@ -9,6 +9,10 @@ var MAX_ROOMS_COUNT = 5;
 var MAX_GUESTS_IN_ROOMS = 3;
 var LOCATION_Y_MIN = 130;
 var LOCATION_Y_MAX = 630;
+var LOCATION_X_MIN = 0;
+var MAIN_PIN_DEFAULT_LEFT = '570px';
+var MAIN_PIN_DEFAULT_TOP = '375px';
+var PIN_WIDTH = 50;
 var NUMBER_ESTATE_OBJECTS = 8;
 var ESTATE_TITLES = ['Большая уютная квартира', 'Маленькая неуютная квартира', 'Огромный прекрасный дворец', 'Маленький ужасный дворец', 'Красивый гостевой домик', 'Некрасивый негостеприимный домик', 'Уютное бунгало далеко от моря', 'Неуютное бунгало по колено в воде'];
 var ESTATE_TYPES = ['palace', 'flat', 'house', 'bungalo'];
@@ -20,7 +24,7 @@ var MOVE_SENSIVITY = 3;
 var EstatePhotos = ['http://o0.github.io/assets/images/tokyo/hotel1.jpg', 'http://o0.github.io/assets/images/tokyo/hotel2.jpg', 'http://o0.github.io/assets/images/tokyo/hotel3.jpg'];
 
 var firstInit = true;
-var formStatus = true;
+var formStatus = false;
 var showedCard = false;
 var popupCard;
 var pinsOnMap;
@@ -80,7 +84,7 @@ var getRandomItem = function (array) {
 };
 
 var getRandomEstateObject = function (numberEstateOblect) {
-  var locationX = getLocationXOrY(MinMaxXMapPin[0], MinMaxXMapPin[1]);
+  var locationX = getLocationXOrY(LOCATION_X_MIN, MaxXMapPin);
   var locationY = getLocationXOrY(LOCATION_Y_MIN, LOCATION_Y_MAX);
   var countRooms = getRandomMinMax(MIN_ROOMS_COUNT, MAX_ROOMS_COUNT);
 
@@ -128,18 +132,16 @@ var getEstateTypeTranslate = function (currentObject) {
 
 var getMaxXPin = function () {
   var insertPlacePin = document.querySelector('.map__pins');
-  var templatePin = document.querySelector('#pin').content;
-  var pinTemplateWidth = getComputedStyle(templatePin.querySelector('.map__pin')).width;
-  var mapMaxX = insertPlacePin.clientWidth - parseInt(pinTemplateWidth, 10);
-  var mapMinX = 0;
-  return [mapMinX, mapMaxX];
+  var mapMaxX = parseInt(insertPlacePin.clientWidth, 10) - PIN_WIDTH;
+  return mapMaxX;
 };
 
 var getNewPin = function (estateObject, template, number) {
   var newMapPin = template.cloneNode(true);
   var firstTag = newMapPin.querySelector('.map__pin');
   var secondTag = newMapPin.querySelector('img');
-  firstTag.style = 'left: ' + estateObject.location.x + 'px; top: ' + estateObject.location.y + 'px;';
+  var styleText = 'left:' + estateObject.location.x + 'px; top:' + estateObject.location.y + 'px;';
+  firstTag.style.cssText = styleText;
   firstTag.setAttribute('name', 'pin' + number);
   secondTag.src = estateObject.author.avatar;
   secondTag.alt = estateObject.offer.title;
@@ -154,6 +156,7 @@ var pushPinsToMap = function (massiveObjects) {
     fragmentPin.appendChild(getNewPin(massiveObjects[i], templatePin, i));
   }
   insertPlacePin.appendChild(fragmentPin);
+  // firstInit = false;
 };
 
 var slicePinId = function (name) {
@@ -319,6 +322,22 @@ var activateForm = function () {
     var submitElement = document.querySelector('.ad-form__submit');
     var resetElement = document.querySelector('.ad-form__reset');
 
+    var submitData = function (evt) {
+      evt.preventDefault();
+      /*    for (var i = 0; i < formElement.elements.length; i++) {
+        formElement.elements[i].validity
+      }
+
+      if (evt.callback === 'sucess') {
+        viewSendMessage();
+      }
+      if (evt.callback === 'error') {
+        viewErrorMessage();
+      }
+      */
+      return false;
+    };
+    submitElement.addEventListener('click', submitData);
   }
 
   var hideMapPins = function () {
@@ -345,24 +364,13 @@ var activateForm = function () {
       showedCard = false;
     }
     setTimeout(getAdressDefault(), 0);
-    mainPinPoint.addEventListener('mouseup', getMapObjects);
+    mainPinPoint.style.left = MAIN_PIN_DEFAULT_LEFT;
+    mainPinPoint.style.top = MAIN_PIN_DEFAULT_TOP;
+    getAdressDefault();
+
   };
 
-  var submitData = function (evt) {
-    evt.preventDefault();
-    /*    for (var i = 0; i < formElement.elements.length; i++) {
-      formElement.elements[i].validity
-    }
 
-    if (evt.callback === 'sucess') {
-      viewSendMessage();
-    }
-    if (evt.callback === 'error') {
-      viewErrorMessage();
-    }
-    */
-    return false;
-  };
   /*
   var viewSendMessage = function () {
     var sendMessageTemplate = document.querySelector('#success').content;
@@ -390,7 +398,7 @@ var activateForm = function () {
   };
   target="_blank"
  */
-  submitElement.addEventListener('click', submitData);
+
   resetElement.addEventListener('click', setDefaultPage);
   var formElement = document.querySelector('.ad-form');
   formElement.addEventListener('reset', getAdressDefault);
@@ -453,7 +461,7 @@ var getAdressDefault = function () {
 };
 
 var putLocationAddress = function (address) {
-  address[0] += MinMaxXMapPin[0];
+  address[0] += LOCATION_X_MIN;
   address[1] += LOCATION_Y_MIN;
   document.querySelector('#address').value = address;
 };
@@ -497,7 +505,7 @@ var addHiddenCard = function () {
 var avatarsSequenceIndex = getArraySequence(AUTHORS_COUNT);
 var avatarsRandomSequenceIndex = getArrayRandomSequence(avatarsSequenceIndex);
 var estateTitlesIndex = getArrayRandomSequence(ESTATE_TITLES);
-var MinMaxXMapPin = getMaxXPin();
+var MaxXMapPin = getMaxXPin();
 
 var estateObjects = [];
 for (var i = 0; i < NUMBER_ESTATE_OBJECTS; i++) {
@@ -511,97 +519,92 @@ getAdressDefault();
 
 var movingObject = {};
 var defaultPosition = {};
-var mapBlock = document.querySelector('.map--faded');
+// var mapBlock = document.querySelector('.map--faded');
 var nomoveFlag = true;
 
-movingObject.mapMinX = MinMaxXMapPin[0];
-movingObject.mapMaxX = MinMaxXMapPin[1];
+movingObject.mapMinX = LOCATION_X_MIN;
+movingObject.mapMaxX = MaxXMapPin;
 
 movingObject.mapMinY = LOCATION_Y_MIN;
 movingObject.mapMaxY = LOCATION_Y_MAX;
 
-var pictureMousedownHandler = function (evt) {
+var mainPinMousedownHandler = function (evt) {
 
   movingObject.downX = evt.clientX;
   movingObject.downY = evt.clientY;
 
-  document.addEventListener('mousemove', clonePinMousemoveHandler);
+  var mainPinMousemoveHandler = function (evtMove) {
+
+    if (nomoveFlag) {
+
+      var moveX = evtMove.clientX - movingObject.downX;
+      var moveY = evtMove.clientY - movingObject.downY;
+      if (Math.abs(moveX) < MOVE_SENSIVITY && Math.abs(moveY) < MOVE_SENSIVITY) {
+        return;
+      } else {
+        nomoveFlag = false;
+      }
+
+      defaultPosition.x = parseInt(getComputedStyle(mainPinPoint).left, 10);
+      defaultPosition.y = parseInt(getComputedStyle(mainPinPoint).top, 10);
+
+      movingObject.shiftX = movingObject.downX - defaultPosition.x;
+      movingObject.shiftY = movingObject.downY - defaultPosition.y;
+
+      mainPinPoint.style.zIndex = 9999; // to mainPin
+      mainPinPoint.style.position = 'absolute'; // to mainPin
+    }
+
+    moveX = evtMove.clientX - movingObject.shiftX;
+    moveY = evtMove.clientY - movingObject.shiftY;
+    if (moveX > movingObject.mapMaxX) {
+      moveX = movingObject.mapMaxX;
+    }
+    if (moveX < movingObject.mapMinX) {
+      moveX = movingObject.mapMinX;
+    }
+    if (moveY > movingObject.mapMaxY) {
+      moveY = movingObject.mapMaxY;
+    }
+    if (moveY < movingObject.mapMinY) {
+      moveY = movingObject.mapMinY;
+    }
+
+
+    mainPinPoint.style.left = moveX + 'px'; // to mainPin
+    mainPinPoint.style.top = moveY + 'px'; // to mainPin
+
+    movingObject.upX = moveX;
+    movingObject.upY = moveY;
+
+    putLocationAddress([moveX, moveY]);
+
+
+  };
+
+  document.addEventListener('mousemove', mainPinMousemoveHandler);
+
+
+  var mainPinMouseupHandler = function (evtUp) {
+    if (!nomoveFlag) {
+      mainPinPoint.style.left = movingObject.upX;
+      mainPinPoint.style.top = movingObject.upY;
+
+      if (!formStatus) {
+        getMapObjects([evtUp.clientX, evtUp.clientY]); // проверить координаты носика точки, вероятно нужна корректировка
+      }
+    }
+    if (nomoveFlag) {
+      putLocationAddress([evtUp.clientX, evtUp.clientY]); // проверить координаты носика точки, вероятно нужна корректировка
+    }
+
+    document.removeEventListener('mousemove', mainPinMousemoveHandler);
+
+  };
+
   document.addEventListener('mouseup', mainPinMouseupHandler);
 };
 
-mainPinPoint.addEventListener('mousedown', pictureMousedownHandler);
+mainPinPoint.addEventListener('mousedown', mainPinMousedownHandler);
 
-var clonePinMousemoveHandler = function (evt) {
-
-  if (!movingObject.avatar) {
-
-    var moveX = evt.clientX - movingObject.downX;
-    var moveY = evt.clientY - movingObject.downY;
-    if (Math.abs(moveX) < MOVE_SENSIVITY && Math.abs(moveY) < MOVE_SENSIVITY) {
-      return;
-    } else {
-      nomoveFlag = false;
-    }
-
-    movingObject.avatar = mainPinPoint.cloneNode(true);
-    mainPinPoint.classList.add('hidden');
-
-    defaultPosition.x = parseInt(getComputedStyle(mainPinPoint).left, 10);
-    defaultPosition.y = parseInt(getComputedStyle(mainPinPoint).top, 10);
-
-    movingObject.shiftX = movingObject.downX - defaultPosition.x;
-    movingObject.shiftY = movingObject.downY - defaultPosition.y;
-
-    mapBlock.appendChild(movingObject.avatar);
-
-    movingObject.avatar.style.zIndex = 9999;
-    movingObject.avatar.style.position = 'absolute';
-  }
-
-  moveX = evt.clientX - movingObject.shiftX;
-  moveY = evt.clientY - movingObject.shiftY;
-  if (moveX > movingObject.mapMaxX) {
-    moveX = movingObject.mapMaxX;
-  }
-  if (moveX < movingObject.mapMinX) {
-    moveX = movingObject.mapMinX;
-  }
-  if (moveY > movingObject.mapMaxY) {
-    moveY = movingObject.mapMaxY;
-  }
-  if (moveY < movingObject.mapMinY) {
-    moveY = movingObject.mapMinY;
-  }
-
-
-  movingObject.avatar.style.left = moveX + 'px';
-  movingObject.avatar.style.top = moveY + 'px';
-
-  movingObject.upX = moveX;
-  movingObject.upY = moveY;
-
-  putLocationAddress([moveX, moveY]);
-
-
-};
-
-var mainPinMouseupHandler = function (evt) {
-  if (movingObject.avatar) {
-    mainPinPoint.style.left = movingObject.avatar.style.left;
-    mainPinPoint.style.top = movingObject.avatar.style.top;
-    movingObject.avatar.remove();
-    mainPinPoint.classList.remove('hidden');
-
-    if (firstInit) {
-      getMapObjects([evt.clientX, evt.clientY]);
-    }
-  }
-  if (nomoveFlag) {
-    putLocationAddress([evt.clientX, evt.clientY]);
-  }
-
-  document.removeEventListener('mousemove', clonePinMousemoveHandler);
-  movingObject.avatar = '';
-
-};
 
