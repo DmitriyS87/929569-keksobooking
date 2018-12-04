@@ -530,6 +530,12 @@ var mainPinMousedownHandler = function (evt) {
   movingObject.downX = evt.clientX;
   movingObject.downY = evt.clientY;
 
+  defaultPosition.x = parseInt(getComputedStyle(mainPinPoint).left, 10);
+  defaultPosition.y = parseInt(getComputedStyle(mainPinPoint).top, 10);
+
+  movingObject.shiftX = movingObject.downX - defaultPosition.x;
+  movingObject.shiftY = movingObject.downY - defaultPosition.y;
+
   var mainPinMousemoveHandler = function (evtMove) {
 
     if (isDragged) {
@@ -542,11 +548,6 @@ var mainPinMousedownHandler = function (evt) {
         isDragged = false;
       }
 
-      defaultPosition.x = parseInt(getComputedStyle(mainPinPoint).left, 10);
-      defaultPosition.y = parseInt(getComputedStyle(mainPinPoint).top, 10);
-
-      movingObject.shiftX = movingObject.downX - defaultPosition.x;
-      movingObject.shiftY = movingObject.downY - defaultPosition.y;
 
       mainPinPoint.style.zIndex = 9999; // to mainPin
       mainPinPoint.style.position = 'absolute'; // to mainPin
