@@ -1,7 +1,5 @@
 'use strict';
 
-
-
 var AVATARS_PATH = 'img/avatars/user0';
 var AUTHORS_COUNT = 8;
 var MIN_PRICE_UNIT = 1000;
