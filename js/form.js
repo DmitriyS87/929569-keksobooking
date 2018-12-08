@@ -73,15 +73,11 @@
       };
 
       var synchronizeCheckOut = function () {
-        checkOutTimeSelect.removeEventListener('change', synchronizeCheckOut);
         checkOutTimeSelect.selectedIndex = checkInTimeSelect.selectedIndex;
-        checkOutTimeSelect.addEventListener('change', synchronizeCheckOut);
       };
 
       var synchronizeCheckIn = function () {
-        checkInTimeSelect.removeEventListener('change', synchronizeCheckIn);
         checkInTimeSelect.selectedIndex = checkOutTimeSelect.selectedIndex;
-        checkInTimeSelect.addEventListener('change', synchronizeCheckIn);
       };
 
       var estateTypeSelect = document.querySelector('#type');
