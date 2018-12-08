@@ -1,71 +1,93 @@
 'use strict';
 
-// модуль map отвечает за работу карты, вывод данных карты
+// модуль map отвечает за работу карты
+
 (function () {
 
   var MAIN_PIN_DEFAULT_LEFT = 570;
   var MAIN_PIN_DEFAULT_TOP = 375;
 
-  var mapExport = {};
+  var pinsOnMap;
 
 
-  mapExport.slicePinId = function (name) {
+  var slicePinId = function (name) {
     return parseInt(name.slice(3), 10);
   };
 
   var mainPinPoint = document.querySelector('.map__pin--main');
 
-  mapExport.mainPinPoint = mainPinPoint;
-
-  mapExport.sizeMainPin = {
+  var sizeMainPin = {
     width: parseInt(getComputedStyle(mainPinPoint).width, 10),
     height: parseInt(getComputedStyle(mainPinPoint).height, 10),
     defaultX: parseInt(mainPinPoint.style.left, 10) + Math.round(parseInt(getComputedStyle(mainPinPoint).width, 10) / 2),
     defaultY: parseInt(mainPinPoint.style.top, 10) + Math.round(parseInt(getComputedStyle(mainPinPoint).height, 10) / 2)
   };
 
-  mapExport.setMainPinDefaultPosition = function () {
+  var setMainPinDefault = function () {
+    mainPinPoint.removeAttribute('style');
     window.map.mainPinPoint.style.left = MAIN_PIN_DEFAULT_LEFT + 'px';
     window.map.mainPinPoint.style.top = MAIN_PIN_DEFAULT_TOP + 'px';
   };
 
-  mapExport.removeMainPinListener = function () {
-    mainPinPoint.removeEventListener('mouseup', window.util.initMain);
+  var removeMainPinListener = function () {
+    mainPinPoint.removeEventListener('mouseup', window.init.initMain);
   };
 
-  mapExport.pushPinsToMap = function (massiveObjects) {
+  var pushPinsToMap = function (massiveObjects) {
     var fragmentPin = document.createDocumentFragment();
     var insertPlacePin = document.querySelector('.map__pins');
-    // var templatePin = document.querySelector('#pin').content; // ???
     for (var i = 0; i < massiveObjects.length; i++) {
-      fragmentPin.appendChild(window.pin.getNewPin(massiveObjects[i], i)); // window.newMapPin?!
+      fragmentPin.appendChild(window.pin.getNewPin(massiveObjects[i], i));
     }
     insertPlacePin.appendChild(fragmentPin);
-    // firstInit = false;
   };
 
-  mapExport.showPins = function () { // параметр - текущие кнопки на карте
-    window.form.pinsOnMap.forEach(function (pin) { // надо бы переделать в более общую функцию
+  var addEventsPin = function () {
+    document.querySelectorAll('.map__pin:not(.map__pin--main)').forEach(function (pin) {
+      pin.addEventListener('click', function () {
+        window.card.changeCardData(window.map.slicePinId(pin.getAttribute('name')));
+        window.util.showElement(document.querySelector('.map__card'));
+        window.card.showedCard = true;
+      });
+    });
+  };
+
+  var showPins = function () {
+    document.querySelectorAll('.map__pin:not(.map__pin--main)').forEach(function (pin) {
       window.util.showElement(pin);
     });
   };
 
-  mapExport.hideMapPins = function () { // параметр - текущие кнопки на карте
-    window.form.pinsOnMap.forEach(function (pin) {
+  var hideMapPins = function () {
+    document.querySelectorAll('.map__pin:not(.map__pin--main)').forEach(function (pin) {
       pin.removeEventListener('click', function () {
-        window.changeCardData(mapExport.slicePinId(pin.getAttribute('name')));
-        if (!window.card.showedCard === true) { // showedCard объявлен в другом модуле
-          window.util.showElement(window.card.popupCard); // наверное некая функция в карде или объект в виндоу
-          window.card.showedCard = true; // showedCard объявлен в другом модуле
+        window.changeCardData(slicePinId(pin.getAttribute('name')));
+
+
+        if (!window.card.showedCard === true) {
+          window.util.showElement(window.card.popupCard);
+          window.card.showedCard = true;
         }
-        window.card.crossAddListner();//  задает событие на крестик карточки как исправить?!
+
+
       });
       window.util.hideElement(pin);
     });
-    mainPinPoint.removeEventListener('mouseup', window.util.initMain); // надо делить или менять иное решение?
+    mainPinPoint.removeEventListener('mouseup', window.init.initMain);
   };
 
-  window.map = mapExport;
+  window.map = {
+    slicePinId: slicePinId,
+    mainPinPoint: mainPinPoint,
+    pinsOnMap: pinsOnMap,
+    sizeMainPin: sizeMainPin,
+    setMainPinDefault: setMainPinDefault,
+    removeMainPinListener: removeMainPinListener,
+    pushPinsToMap: pushPinsToMap,
+    showPins: showPins,
+    hideMapPins: hideMapPins,
+    addEventsPin: addEventsPin
+  };
 })();
 
 

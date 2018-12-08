@@ -7,12 +7,12 @@
 
   var estateDataExport = {};
 
-  // дублированные данные
+
   var LOCATION_Y_MIN = 130;
   var LOCATION_Y_MAX = 630;
   var LOCATION_X_MIN = 0;
   var PIN_WIDTH = 50;
-  // -----------------------
+
 
   var AVATARS_PATH = 'img/avatars/user0';
   var AUTHORS_COUNT = 8;
@@ -51,7 +51,7 @@
   };
 
 
-  var getLocationXOrY = function (min, max) { // функция как ссылка на функцию зачем нужна?
+  var getLocationXOrY = function (min, max) {
     return getRandomMinMax(min, max);
   };
 

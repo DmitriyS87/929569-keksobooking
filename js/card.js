@@ -2,42 +2,28 @@
 
 (function () {
 
-  var cardExport = {};
 
   var showedCard = false;
 
-  cardExport.showedCard = showedCard;
-
   var estateObjects = window.estateData.estateObjects;
+  var templateCard = document.querySelector('#card').content;
 
-  // var popupCard = document.querySelector('.map__card');
-  // var cross = popupCard.querySelector('.popup__close');
   var popupCard;
   var cross;
 
-  cardExport.crossRemoveListner = function () {
-    cross.removeEventListener('click', crossClickHandler);
-  };
-
-  cardExport.crossAddListner = function () {
-    cross.addEventListener('click', crossClickHandler);
-  };
-
-  var crossClickHandler = function () { // где живет? где используется?
-    window.util.hideElement(popupCard);
-    cross.removeEventListener('click', crossClickHandler);
-    window.card.showedCard = false;
-  };
-
-  cardExport.addHiddenCard = function () { // функция нужна при инициализации страницы... тут не используется
+  var addHiddenCard = function () {
     var fragmentCard = document.createDocumentFragment();
-    var templateCard = document.querySelector('#card').content;
     fragmentCard.appendChild(templateCard);
     var insertPlaceCard = document.querySelector('.map');
-    var beforeDOMItem = document.querySelector('.map__filters-container');
-    insertPlaceCard.insertBefore(fragmentCard, beforeDOMItem);
+    insertPlaceCard.insertBefore(fragmentCard, insertPlaceCard.lastChild);
     popupCard = document.querySelector('.map__card');
     cross = popupCard.querySelector('.popup__close');
+    cross.addEventListener('click', crossClickHandler);
+    window.util.hideElement(popupCard);
+    showedCard = false;
+  };
+
+  var crossClickHandler = function () {
     window.util.hideElement(popupCard);
     showedCard = false;
   };
@@ -59,7 +45,7 @@
   };
 
 
-  cardExport.changeCardData = function (index) { // функция не используется... что делать?
+  var changeCardData = function (index) {
 
     popupCard.querySelector('.popup__title').textContent = estateObjects[index].offer.title;
     popupCard.querySelector('.popup__text--address').textContent = estateObjects[index].offer.address;
@@ -95,15 +81,11 @@
       estatePhotosDiv.appendChild(currentImgClone);
     }
     popupCard.querySelector('.popup__avatar').src = estateObjects[index].author.avatar;
-    if (!cardExport.showedCard === true) {
-      window.util.showElement(popupCard);
-    }
   };
 
-  cardExport.cross = cross;
-  cardExport.popupCard = popupCard;
-
-
-  window.card = cardExport;
-
+  window.card = {
+    showedCard: showedCard,
+    addHiddenCard: addHiddenCard,
+    changeCardData: changeCardData,
+  };
 })();

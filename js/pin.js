@@ -1,9 +1,7 @@
 'use strict';
 (function () {
 
-  var pinExport = {};
-
-  pinExport.getNewPin = function (estateObject, number) {
+  var getNewPin = function (estateObject, number) {
     var template = document.querySelector('#pin').content;
     var newMapPin = template.cloneNode(true);
 
@@ -19,7 +17,9 @@
     return newMapPin;
   };
 
-  window.pin = pinExport;
+  window.pin = {
+    getNewPin: getNewPin
+  };
 
 })();
 

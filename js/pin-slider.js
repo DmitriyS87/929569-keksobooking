@@ -1,19 +1,6 @@
 'use strict';
 
 (function () {
-// drag n drop main Pin -----------------------------------------------------------------------------------------------------
-
-  /*
-модуль оживляет кнопку
-резульат - пользователь получает движение
-программа получает координаты и сигнал акитвации страницы
-
-результат функции:
-1) данамичная кнопка
-2) инициализация карты и формы
-3) передаем результат - запуск активной формы да/нет
-4) координаты кнопки
-*/
 
   var MOVE_SENSIVITY = 3;
 
@@ -31,15 +18,7 @@
 
   var mapPinMaxX = getPinMaxX();
   var mainPinPoint = document.querySelector('.map__pin--main');
-  /* var sizeMainPin = {
-    width: parseInt(getComputedStyle(mainPinPoint).width, 10),
-    height: parseInt(getComputedStyle(mainPinPoint).height, 10),
-    defaultX: parseInt(mainPinPoint.style.left, 10) + Math.round(sizeMainPin.width / 2),
-    defaultY: parseInt(mainPinPoint.style.top, 10) + Math.round(sizeMainPin.height / 2)
-  };
-*/
 
-  // -----------------------------------------------------------
   var defaultPosition = {};
 
   var mainPinMousedownHandler = function (evt) {
@@ -74,8 +53,8 @@
           isDragged = false;
         }
 
-        mainPinPoint.style.zIndex = 9999; // to mainPin
-        mainPinPoint.style.position = 'absolute'; // to mainPin
+        mainPinPoint.style.zIndex = 9999;
+        mainPinPoint.style.position = 'absolute';
       }
 
       moveX = evtMove.clientX - differenceCords.shiftX;
@@ -101,7 +80,7 @@
       downUpCords.upX = moveX;
       downUpCords.upY = moveY;
 
-      window.form.putLocationAddress([moveX, moveY]); // пока решение через window!!!
+      window.form.putLocationAddress([moveX, moveY]);
 
     };
 
@@ -114,14 +93,15 @@
         mainPinPoint.style.top = downUpCords.upY;
 
         if (!window.form.formStatus) {
-          window.util.initMain(); // инициирует первый запуск
-          window.form.putLocationAddress([evtUp.clientX, evtUp.clientY]); // меняет адрес у поля инпут
+          window.init.initMain();
+          window.form.putLocationAddress([evtUp.clientX, evtUp.clientY]);
         }
       } else {
-        window.form.putLocationAddress([evtUp.clientX, evtUp.clientY]); // меняет адрес у поля инпут
+        window.form.putLocationAddress([evtUp.clientX, evtUp.clientY]);
       }
 
       document.removeEventListener('mousemove', mainPinMousemoveHandler);
+
 
     };
 
@@ -129,8 +109,6 @@
   };
 
   mainPinPoint.addEventListener('mousedown', mainPinMousedownHandler);
-
-  // ------------------------------------------------------------------------------------------------------------------------------------------
 
 })();
 

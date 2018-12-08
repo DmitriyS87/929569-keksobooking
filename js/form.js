@@ -5,22 +5,17 @@
   var LOCATION_Y_MIN = 130;
   var LOCATION_X_MIN = 0;
 
+  var formStatus = false; // ?
+  var firstInit = true;
 
-  var pinsOnMap;// ???
-
-  var formExport = {};
-
-  formExport.formStatus = false;
-  formExport.firstInit = true;
-
-  formExport.putLocationAddress = function (address) { // ?
+  var putLocationAddress = function (address) { // ?
     address[0] += LOCATION_X_MIN;
     address[1] += LOCATION_Y_MIN;
     document.querySelector('#address').value = address;
   };
 
 
-  formExport.setAdressDefault = function () {
+  var setAdressDefault = function () {
     document.querySelector('#address').value = [window.map.sizeMainPin.defaultX, window.map.sizeMainPin.defaultY];
   };
 
@@ -34,42 +29,27 @@
   };
 
 
-  formExport.disableForm = function () {
-    if (formExport.formStatus) {
+  var disableForm = function () {
+    if (!formStatus) {
       var formHeaderFildset = document.querySelector('.ad-form-header');
       setElementDisabled(formHeaderFildset);
       var elementsFieldset = document.querySelectorAll('.ad-form__element');
       elementsFieldset.forEach(function (element) {
         setElementDisabled(element);
       });
-      formExport.formStatus = false;
+      formStatus = false;
     }
   };
 
 
-  formExport.activateForm = function () {
-    if (!formExport.formStatus) {
+  var activateForm = function () {
+    if (!formStatus) {
       var formHeaderFildset = document.querySelector('.ad-form-header');
       setElementEnabled(formHeaderFildset);
       var elementsFieldset = document.querySelectorAll('.ad-form__element');
       elementsFieldset.forEach(function (element) {
         setElementEnabled(element);
       });
-      if (formExport.firstInit) {
-        pinsOnMap = document.querySelectorAll('.map__pin:not(.map__pin--main)');
-        pinsOnMap.forEach(function (pin) {
-          pin.addEventListener('click', function () {
-            window.card.changeCardData(window.map.slicePinId(pin.getAttribute('name')));
-            if (!window.card.showedCard === true) {
-              window.util.showElement(document.querySelector('.map__card'));
-              window.card.showedCard = true;
-            }
-            window.card.crossAddListner();// // функция работает с формой. а вешает обработчик на карточку... надо исправить
-          });
-        });
-        window.map.removeMainPinListener(); // window.map.mainPinPoint.removeEventListener('mouseup', initMain); // надо делить... или менять
-      }
-
 
       var getMinPrice = function (index) {
         switch (estateTypeSelect.item(index).textContent) {
@@ -159,7 +139,6 @@
       roomsSelect.addEventListener('change', synchronizeCapacity);
 
       var submitElement = document.querySelector('.ad-form__submit');
-      var resetElement = document.querySelector('.ad-form__reset');
 
       var submitData = function (evt) {
         evt.preventDefault();
@@ -207,17 +186,22 @@
     };
     target="_blank"
    */
-
-    resetElement.addEventListener('click', window.util.setDefaultPage);
+    var resetElement = document.querySelector('.ad-form__reset');
+    resetElement.addEventListener('click', window.init.setDefaultPage);
     var formElement = document.querySelector('.ad-form');
-    formElement.addEventListener('reset', formExport.setAdressDefault);
+    formElement.addEventListener('reset', setAdressDefault);
     // formElement.addEventListener('submit', submitData);
-
-    formExport.formStatus = true; // нужна для слайдера
-    formExport.firstInit = false;
-    formExport.pinsOnMap = pinsOnMap;
 
   };
 
-  window.form = formExport;
+  window.form = {
+    formStatus: formStatus,
+    firstInit: firstInit,
+    putLocationAddress: putLocationAddress,
+    disableForm: disableForm,
+    activateForm: activateForm,
+    setAdressDefault: setAdressDefault,
+    setElementEnabled: setElementEnabled,
+    setElementDisabled: setElementDisabled
+  };
 })();
