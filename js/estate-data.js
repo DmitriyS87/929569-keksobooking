@@ -5,8 +5,6 @@
   // создаем массив объектов недвижимости - "база данных" объектов
   // результат работы модуля - массив объектов недвижимости в неком состоянии
 
-  var estateDataExport = {};
-
 
   var LOCATION_Y_MIN = 130;
   var LOCATION_Y_MAX = 630;
@@ -37,56 +35,8 @@
     return mapMaxX;
   };
 
-  var getArrayRandomSequence = function (massive) {
-    var sequence = [];
-    var randomIndex;
-    var auxiliarySequence = getArraySequence(massive.length);
-    for (var j = 0; j < massive.length; j++) {
-      randomIndex = getRandomMinMax(0, massive.length - 1 - j);
-      sequence.push(auxiliarySequence[randomIndex]);
-      auxiliarySequence.splice(randomIndex, 1);
-    }
-    return sequence;
-
-  };
-
-
-  var getLocationXOrY = function (min, max) {
-    return getRandomMinMax(min, max);
-  };
-
-
-  var getRandomMinMax = function (min, max) {
-    var randomCount = Math.round(min + Math.random() * (max - min));
-    return randomCount;
-  };
-
-
-  var chooseRandomArrayItem = function (array) {
-    return array[getRandomMinMax(0, array.length - 1)];
-  };
-
-
-  var getArraySequence = function (max) {
-    var sequence = [];
-    for (var index = 0; index < max; index++) {
-      sequence[index] = index;
-    }
-    return sequence;
-  };
-
-
-  var cropArray = function (massive, endIndex) {
-    var outputMassive = [];
-    for (var i = 0; i < endIndex; i++) {
-      outputMassive.push(massive[i]);
-    }
-    return outputMassive;
-  };
-
-
   var getArrayPhotos = function (massivePhotos) {
-    var randomSequence = getArrayRandomSequence(massivePhotos);
+    var randomSequence = window.util.getArrayRandomSequence(massivePhotos);
     var photosString = [];
     for (var j = 0; j < massivePhotos.length; j++) {
       photosString.push(ESTATE_PHOTOS[randomSequence[j]]);
@@ -96,16 +46,16 @@
   };
 
 
-  var avatarsSequenceIndex = getArraySequence(AUTHORS_COUNT);
-  var avatarsRandomSequenceIndex = getArrayRandomSequence(avatarsSequenceIndex);
-  var estateTitlesIndex = getArrayRandomSequence(ESTATE_TITLES);
+  var avatarsSequenceIndex = window.util.getArraySequence(AUTHORS_COUNT);
+  var avatarsRandomSequenceIndex = window.util.getArrayRandomSequence(avatarsSequenceIndex);
+  var estateTitlesIndex = window.util.getArrayRandomSequence(ESTATE_TITLES);
   var mapPinMaxX = getPinMaxX();
 
 
   var makeRandomEstateObject = function (numberEstateOblect) {
-    var locationX = getLocationXOrY(LOCATION_X_MIN, mapPinMaxX);
-    var locationY = getLocationXOrY(LOCATION_Y_MIN, LOCATION_Y_MAX);
-    var countRooms = getRandomMinMax(MIN_ROOMS_COUNT, MAX_ROOMS_COUNT);
+    var locationX = window.util.getLocationXOrY(LOCATION_X_MIN, mapPinMaxX);
+    var locationY = window.util.getLocationXOrY(LOCATION_Y_MIN, LOCATION_Y_MAX);
+    var countRooms = window.util.getRandomMinMax(MIN_ROOMS_COUNT, MAX_ROOMS_COUNT);
 
     var makedEstateOgj = {
       author: {
@@ -113,13 +63,13 @@
       offer: {
         title: ESTATE_TITLES[estateTitlesIndex[numberEstateOblect]],
         address: [locationX, locationY],
-        price: getRandomMinMax(MIN_PRICE_UNIT, MAX_PRICE_UNIT),
-        type: chooseRandomArrayItem(ESTATE_TYPES),
+        price: window.util.getRandomMinMax(MIN_PRICE_UNIT, MAX_PRICE_UNIT),
+        type: window.util.chooseRandomArrayItem(ESTATE_TYPES),
         rooms: countRooms,
-        guests: getRandomMinMax(1, (countRooms * MAX_GUESTS_IN_ROOMS)),
-        checkin: chooseRandomArrayItem(CHECK_IN_OUT_VARIANTS),
-        checkout: chooseRandomArrayItem(CHECK_IN_OUT_VARIANTS),
-        features: cropArray(FEATURES_VARIANTS, getRandomMinMax(0, FEATURES_VARIANTS.length)),
+        guests: window.util.getRandomMinMax(1, (countRooms * MAX_GUESTS_IN_ROOMS)),
+        checkin: window.util.chooseRandomArrayItem(CHECK_IN_OUT_VARIANTS),
+        checkout: window.util.chooseRandomArrayItem(CHECK_IN_OUT_VARIANTS),
+        features: window.util.cropArray(FEATURES_VARIANTS, window.util.getRandomMinMax(0, FEATURES_VARIANTS.length)),
         description: '',
         photos: getArrayPhotos(ESTATE_PHOTOS)
       },
@@ -135,11 +85,13 @@
   };
 
 
-  estateDataExport.estateObjects = [];
+  var estateObjects = [];
   for (var i = 0; i < NUMBER_ESTATE_OBJECTS; i++) {
-    estateDataExport.estateObjects.push(makeRandomEstateObject(i));
+    estateObjects.push(makeRandomEstateObject(i));
   }
 
-  window.estateData = estateDataExport;
+  window.estateData = {
+    estateObjects: estateObjects
+  };
 
 })();
