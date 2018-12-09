@@ -110,23 +110,15 @@
 
       var synchronizeCapacity = function () {
         var selectedIndx = roomsSelect.selectedIndex;
-        var ruleIndex;
-        if (selectedIndx < 3) {
-          for (var n = 0; n <= selectedIndx; n++) {
-            ruleIndex = getNumberGuestsByRooms(n);
-            capacity.querySelector('[value = \'' + ruleIndex + '\']').disabled = false;
+        var ruleIndex = parseInt(getNumberGuestsByRooms(selectedIndx), 10);
+        for (var k = 0; k < capacity.options.length; k++) {
+          if (k < ruleIndex) {
+            capacity.querySelector('[value = \'' + getNumberGuestsByRooms(k) + '\']').disabled = false;
+          } else if (ruleIndex === 0 && k === 3) {
+            capacity.querySelector('[value = \'' + getNumberGuestsByRooms(k) + '\']').disabled = false;
+          } else {
+            capacity.querySelector('[value = \'' + getNumberGuestsByRooms(k) + '\']').disabled = true;
           }
-          for (var k = n; k < capacity.options.length; k++) {
-            ruleIndex = getNumberGuestsByRooms(k);
-            capacity.querySelector('[value = \'' + ruleIndex + '\']').disabled = true;
-          }
-        } else {
-          for (var m = 0; m < selectedIndx; m++) {
-            ruleIndex = getNumberGuestsByRooms(m);
-            capacity.querySelector('[value = \'' + ruleIndex + '\']').disabled = true;
-          }
-          ruleIndex = getNumberGuestsByRooms(selectedIndx);
-          capacity.querySelector('[value = \'' + ruleIndex + '\']').disabled = false;
         }
       };
 
