@@ -101,6 +101,7 @@
       }
 
       document.removeEventListener('mousemove', mainPinMousemoveHandler);
+      document.removeEventListener('mouseup', mainPinMouseupHandler);
 
 
     };

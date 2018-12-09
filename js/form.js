@@ -37,6 +37,7 @@
       elementsFieldset.forEach(function (element) {
         setElementDisabled(element);
       });
+      document.querySelector('.ad-form').classList.add('ad-form--disabled');
       formStatus = false;
     }
   };
@@ -177,6 +178,7 @@
     var resetElement = document.querySelector('.ad-form__reset');
     resetElement.addEventListener('click', window.init.setDefaultPage);
     var formElement = document.querySelector('.ad-form');
+    formElement.classList.remove('ad-form--disabled');
     formElement.addEventListener('reset', setAdressDefault);
     // formElement.addEventListener('submit', submitData);
 
