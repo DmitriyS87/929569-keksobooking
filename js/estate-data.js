@@ -91,7 +91,8 @@
   }
 
   window.estateData = {
-    estateObjects: estateObjects
+    estateObjects: estateObjects,
+    FEATURES_VARIANTS: FEATURES_VARIANTS
   };
 
 })();

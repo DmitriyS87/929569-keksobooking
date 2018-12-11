@@ -37,6 +37,7 @@
       elementsFieldset.forEach(function (element) {
         setElementDisabled(element);
       });
+
       document.querySelector('.ad-form').classList.add('ad-form--disabled');
       formStatus = false;
     }
@@ -126,63 +127,46 @@
       var roomsSelect = document.querySelector('#room_number');
       var capacity = document.querySelector('#capacity');
       roomsSelect.addEventListener('change', synchronizeCapacity);
-
-      var submitElement = document.querySelector('.ad-form__submit');
-
-      var submitData = function (evt) {
-        evt.preventDefault();
-        /*    for (var i = 0; i < formElement.elements.length; i++) {
-          formElement.elements[i].validity
-        }
-
-        if (evt.callback === 'sucess') {
-          viewSendMessage();
-        }
-        if (evt.callback === 'error') {
-          viewErrorMessage();
-        }
-        */
-        return false;
-      };
-      submitElement.addEventListener('click', submitData);
     }
 
 
-    /*
-    var viewSendMessage = function () {
-      var sendMessageTemplate = document.querySelector('#success').content;
-      var fragmentSuccess = document.createDocumentFragment();
-      fragmentSuccess.appendChild(sendMessageTemplate);
-      document.body.firstElementChild.appendChild(fragmentSuccess);
-      sendMessage = document.querySelector('.success');
-
-      sendMessage.addEventListener('keypress', function (evt) {
-        if (evt.keyCode === ESC_CODE) {
-          deleteMsg(sendMessage);
-        }
-      });
-      sendMessage.addEventListener('click', function () {
-        deleteMsg(sendMessage);
-        removeClickListner();
-      });
-    };
-
-    var viewErrorMessage = function () {
-      var erroorMessageTemplate = document.querySelector('#error').content;
-      var fragmentError = document.createDocumentFragment();
-      fragmentError.appendChild(erroorMessageTemplate);
-      document.body.firstElementChild.appendChild(fragmentError);
-    };
-    target="_blank"
-   */
-    var resetElement = document.querySelector('.ad-form__reset');
-    resetElement.addEventListener('click', window.init.setDefaultPage);
     var formElement = document.querySelector('.ad-form');
     formElement.classList.remove('ad-form--disabled');
-    formElement.addEventListener('reset', setAdressDefault);
-    // formElement.addEventListener('submit', submitData);
 
+    formElement.addEventListener('reset', setAdressDefault);
+
+    var resetElement = document.querySelector('.ad-form__reset');
+    resetElement.addEventListener('click', window.init.setDefaultPage);
   };
+
+  var onLoad = function () {
+    var text = 'Данные о Вашем объявлении успешно отправлены на сервер';
+    document.querySelector('.ad-form__reset').click();
+    // window.init.setDefaultPage();
+    window.init.viewMessage('#success', '.success', text);
+    /* for (var i = 0; i < data.length; i++) {
+      serverEstateData.push(data[i]);
+      // window.estateData.estateObjects.push(data[i]);
+    }
+    // window.estateData.estateObjects = data;
+    console.log(serverEstateData);*/
+  };
+
+  var onError = function (errorMessage) {
+    window.init.viewMessage('#error', '.error', errorMessage);
+    console.log(errorMessage);
+  };
+
+  var submitData = function (evt) {
+    evt.preventDefault();
+    var data = new FormData(document.querySelector('.ad-form'));
+    window.backend.makePostServerRequest(data, onLoad, onError);
+    return false;
+  };
+
+  var submitElement = document.querySelector('.ad-form__submit');
+  submitElement.addEventListener('click', submitData);
+
 
   window.form = {
     formStatus: formStatus,
@@ -192,6 +176,6 @@
     activateForm: activateForm,
     setAdressDefault: setAdressDefault,
     setElementEnabled: setElementEnabled,
-    setElementDisabled: setElementDisabled
+    setElementDisabled: setElementDisabled,
   };
 })();

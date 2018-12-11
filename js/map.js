@@ -8,7 +8,7 @@
   var MAIN_PIN_DEFAULT_TOP = 375;
 
   var pinsOnMap;
-
+  var activePinId;
 
   var slicePinId = function (name) {
     return parseInt(name.slice(3), 10);
@@ -42,9 +42,16 @@
     insertPlacePin.appendChild(fragmentPin);
   };
 
+  var changeActivePin = function (pin) {
+
+    pin.classList.add('.map__pin--active');
+  };
+
   var addEventsPin = function () {
     document.querySelectorAll('.map__pin:not(.map__pin--main)').forEach(function (pin) {
       pin.addEventListener('click', function () {
+        changeActivePin(pin);
+        activePinId = pin.name;
         window.card.changeCardData(window.map.slicePinId(pin.getAttribute('name')));
         window.util.showElement(document.querySelector('.map__card'));
         window.card.showedCard = true;
