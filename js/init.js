@@ -7,16 +7,16 @@
   var serverEstateData = [];
 
   var onLoad = function (data) {
-    for (var i = 0; i < data.length; i++) {
-      serverEstateData.push(data[i]);
-      // window.estateData.estateObjects.push(data[i]);
-    }
+    data.forEach(function (estateObject) {
+      serverEstateData.push(estateObject);
+    });
+    // window.estateData.estateObjects.push(data[i]);
     // window.estateData.estateObjects = data;
-    console.log(serverEstateData);
+    // console.log(serverEstateData);
   };
 
   var onError = function (errorMessage) {
-    console.log(errorMessage);
+    viewMessage('#error', '.error', errorMessage);
   };
 
   window.form.disableForm();
@@ -68,7 +68,6 @@
 
     var documentKeyPressHandler = function (evt) {
       if (evt.keyCode === ESC_CODE) {
-        console.log('ESC!');
         sendMessage.remove(); // parentNode.removeChild(sendMessage);
         document.removeEventListener('keypress', documentKeyPressHandler);
       }

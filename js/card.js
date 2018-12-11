@@ -36,6 +36,7 @@
 
   var crossClickHandler = function () {
     window.util.hideElement(popupCard);
+    window.map.changeActivePin();
     showedCard = false;
   };
 
@@ -71,6 +72,23 @@
 
   };
 
+  var putPhotosToCard = function (index) {
+
+    var estatePhotosDiv = popupCard.querySelector('.popup__photos');
+    window.util.removeChildrens(estatePhotosDiv);
+
+    var constructPhotos = function (item) {
+      var currentImgClone = templateCardImg.cloneNode(true);
+      currentImgClone.src = item;
+      estatePhotosDiv.appendChild(currentImgClone);
+    };
+
+    if (estateObjects[index].offer.photos.length > 0) {
+      estateObjects[index].offer.photos.forEach(constructPhotos);
+    }
+  };
+
+
   var changeCardData = function (index) {
 
     popupCard.querySelector('.popup__title').textContent = estateObjects[index].offer.title;
@@ -95,15 +113,8 @@
     putFeaturesToCard(index);
 
     popupCard.querySelector('.popup__description').textContent = estateObjects[index].offer.description;
-    var estatePhotosDiv = popupCard.querySelector('.popup__photos');
-    window.util.removeChildrens(estatePhotosDiv);
 
-    for (var k = 0; k < estateObjects[index].offer.photos.length; k++) {
-      var currentImgClone = templateCardImg.cloneNode(true);
-      currentImgClone.src = estateObjects[index].offer.photos[k];
-      estatePhotosDiv.appendChild(currentImgClone);
-    }
-
+    putPhotosToCard(index);
 
     popupCard.querySelector('.popup__avatar').src = estateObjects[index].author.avatar;
   };

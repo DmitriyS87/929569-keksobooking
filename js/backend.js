@@ -17,7 +17,7 @@
       }
     }
     if (!xhr) {
-      onError('Невозможно создать XMLHttpRequest'); // вывести сообщение об ошибке
+      onError('Невозможно создать XMLHttpRequest');
     }
 
     return xhr;
@@ -36,34 +36,24 @@
           onLoad(xhr.response);
           break;
         case 400:
-          error = 'Ошибка! Неверный запрос к серверу';
+          error = 'Ошибка при загрузке данных! Неверный запрос к серверу. Сообщите администратору сайта о проблеме при запросе данных от сервера';
           break;
         case 401:
-          error = 'Ошибка! Недостаточно прав для выполнения запроса! Пройдите авторизацию';
+          error = 'Ошибка при загрузке данных! Недостаточно прав для выполнения запроса! Пройдите авторизацию.';
           break;
         case 404:
-          error = 'Ошибка! Запрашиваемая инфомрация не найдена';
+          error = 'Ошибка при загрузке данных! Запрашиваемая инфомрация не найдена.';
           break;
         default:
-          error = 'Ошибка! Статус ответа: ' + xhr.status + '  ' + xhr.statusText;
+          error = 'Ошибка при загрузке данных! Статус ответа: ' + xhr.status + '  ' + xhr.statusText + '. Попробуйте перезагрузить страницу';
       }
       if (error) {
         onError(error);
       }
-
-
     };
 
     var getErrorHandler = function () {
-      onError('Серевер вернул неверный формат ответа на запрос');
-    };
-
-    var getReadyStateHandler = function () {
-      /* if (evt.readyState === 1) {
-        window.form.setElementDisabled(); // добавить изменение класса + disabled и отмену
-      }*/
-      console.log('Стадия обработки запроса:  ' + xhr.readyState);
-
+      onError('Серевер вернул неподдерживаемый ответ на запрос');
     };
 
     var getAbortStateHandler = function () {
@@ -76,16 +66,10 @@
     };
 
     xhr.responseType = 'json';
-    xhr.timeout = 3000; // xhr.abort();
-    /* xhr.onreadystatechange = func;
-    var func = function () {
-
-    };*/
-
+    xhr.timeout = 3000;
 
     xhr.addEventListener('load', getLoadHandler);
     xhr.addEventListener('error', getErrorHandler);
-    xhr.addEventListener('readystatechange', getReadyStateHandler);
     xhr.addEventListener('abort', getAbortStateHandler);
     xhr.addEventListener('timeout', getTimeoutHandler);
 
@@ -94,32 +78,30 @@
   };
 
   var makePostServerRequest = function (data, onLoad, onError) {
-    var URL = 'https://js.dump.academy/keksobooking7';
+    var URL = 'https://js.dump.academy/keksobooking';
 
     var xhr = createXhr();
-    // xhr.responseType = 'json';
-
-    // xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-
 
     var postErrorHandler = function () {
       onError('Серевер вернул ошибку при обработке запроса');
     };
 
     var postReadyStateHandler = function () {
-      /* if (evt.readyState === 1) {
-        window.form.setElementDisabled(); // добавить изменение класса + disabled и отмену
-      }*/
-      console.log('Стадия обработки запроса:  ' + xhr.readyState);
-
+      var submitButton = document.querySelector('.ad-form__submit');
+      if (xhr.readyState === 2) {
+        window.form.setElementDisabled(submitButton);
+      }
+      if (xhr.readyState === 4) {
+        window.form.setElementEnabled(submitButton);
+      }
     };
 
     var postAbortStateHandler = function () {
-      onError('Обрыв соединения!!!');
+      onError('Непредвиденная ошибка. Произошел обрыв соединения с сервером');
     };
 
     var postTimeoutHandler = function () {
-      onError('Превышен интревал одидания ответа от Сервера. Операция отменена');
+      onError('Превышен интревал одидания ответа от Сервера. Сервер перегружен. Пожалуйста, попробуйте повторить действие через несколько минут');
       xhr.abort();
     };
 
@@ -146,7 +128,6 @@
       }
     };
 
-
     xhr.addEventListener('load', postLoadHandler);
     xhr.addEventListener('error', postErrorHandler);
     xhr.addEventListener('readystatechange', postReadyStateHandler);
@@ -155,13 +136,6 @@
 
     xhr.open('POST', URL, true);
     xhr.send(data);
-  };
-
-  var xhr = new XMLHttpRequest();
-  xhr.responseType = 'json';
-  xhr.onreadystatechange = func;
-  var func = function () {
-
   };
 
   window.backend = {

@@ -144,17 +144,11 @@
     document.querySelector('.ad-form__reset').click();
     // window.init.setDefaultPage();
     window.init.viewMessage('#success', '.success', text);
-    /* for (var i = 0; i < data.length; i++) {
-      serverEstateData.push(data[i]);
-      // window.estateData.estateObjects.push(data[i]);
-    }
-    // window.estateData.estateObjects = data;
-    console.log(serverEstateData);*/
   };
 
   var onError = function (errorMessage) {
     window.init.viewMessage('#error', '.error', errorMessage);
-    console.log(errorMessage);
+    // console.log(errorMessage);
   };
 
   var submitData = function (evt) {

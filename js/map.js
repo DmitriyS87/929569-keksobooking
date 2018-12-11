@@ -10,8 +10,8 @@
   var pinsOnMap;
   var activePinId;
 
-  var slicePinId = function (name) {
-    return parseInt(name.slice(3), 10);
+  var slicePinId = function (id) {
+    return parseInt(id.slice(3), 10);
   };
 
   var mainPinPoint = document.querySelector('.map__pin--main');
@@ -36,23 +36,33 @@
   var pushPinsToMap = function (massiveObjects) {
     var fragmentPin = document.createDocumentFragment();
     var insertPlacePin = document.querySelector('.map__pins');
-    for (var i = 0; i < massiveObjects.length; i++) {
-      fragmentPin.appendChild(window.pin.getNewPin(massiveObjects[i], i));
-    }
+    var i = 0;
+    massiveObjects.forEach(function (estateObject) {
+      if (estateObject.offer.title && estateObject.offer.price && estateObject.location.x && estateObject.location.y) {
+        fragmentPin.appendChild(window.pin.getNewPin(estateObject, i));
+        i++;
+      } else {
+        massiveObjects = massiveObjects.splice(i, 1);
+      }
+    });
     insertPlacePin.appendChild(fragmentPin);
   };
 
   var changeActivePin = function (pin) {
-
-    pin.classList.add('.map__pin--active');
+    if (activePinId) {
+      document.getElementById(activePinId).classList.remove('.map__pin--active');
+    }
+    if (pin) {
+      pin.classList.add('.map__pin--active');
+    }
   };
 
   var addEventsPin = function () {
     document.querySelectorAll('.map__pin:not(.map__pin--main)').forEach(function (pin) {
       pin.addEventListener('click', function () {
         changeActivePin(pin);
-        activePinId = pin.name;
-        window.card.changeCardData(window.map.slicePinId(pin.getAttribute('name')));
+        activePinId = pin.getAttribute('id');
+        window.card.changeCardData(slicePinId(activePinId));
         window.util.showElement(document.querySelector('.map__card'));
         window.card.showedCard = true;
       });
@@ -68,7 +78,7 @@
   var hideMapPins = function () {
     document.querySelectorAll('.map__pin:not(.map__pin--main)').forEach(function (pin) {
       pin.removeEventListener('click', function () {
-        window.changeCardData(slicePinId(pin.getAttribute('name')));
+        window.changeCardData(slicePinId(pin.getAttribute('id')));
 
 
         if (!window.card.showedCard === true) {
@@ -93,7 +103,8 @@
     pushPinsToMap: pushPinsToMap,
     showPins: showPins,
     hideMapPins: hideMapPins,
-    addEventsPin: addEventsPin
+    addEventsPin: addEventsPin,
+    changeActivePin: changeActivePin
   };
 })();
 
