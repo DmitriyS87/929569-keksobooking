@@ -75,19 +75,44 @@
   var putPhotosToCard = function (index) {
 
     var estatePhotosDiv = popupCard.querySelector('.popup__photos');
+    var photosFragment = document.createDocumentFragment();
     window.util.removeChildrens(estatePhotosDiv);
 
     var constructPhotos = function (item) {
       var currentImgClone = templateCardImg.cloneNode(true);
       currentImgClone.src = item;
-      estatePhotosDiv.appendChild(currentImgClone);
+      photosFragment.appendChild(currentImgClone);
     };
 
     if (estateObjects[index].offer.photos.length > 0) {
       estateObjects[index].offer.photos.forEach(constructPhotos);
+      estatePhotosDiv.appendChild(photosFragment);
+      photosZoom();
     }
   };
 
+  var photosZoom = function () {
+    var message;
+    var templateZoomPhoto;
+
+    document.querySelectorAll('.popup__photos img').forEach(function (img) {
+      var imgClickHandler = function () {
+        message = document.querySelector('#zoomcardphoto').content;
+        templateZoomPhoto = message.cloneNode(true);
+        document.body.firstElementChild.appendChild(templateZoomPhoto);
+        document.querySelector('.card_photo img').src = img.src;
+        var zoomPhotoClickHandler = function () {
+          document.querySelector('.card_photo img').removeEventListener('click', zoomPhotoClickHandler);
+          document.querySelector('.card_photo').remove();
+        };
+
+        document.querySelector('.card_photo img').addEventListener('click', zoomPhotoClickHandler);
+
+      };
+      img.addEventListener('click', imgClickHandler);
+
+    });
+  };
 
   var changeCardData = function (index) {
 

@@ -7,7 +7,6 @@
   var MAIN_PIN_DEFAULT_LEFT = 570;
   var MAIN_PIN_DEFAULT_TOP = 375;
 
-  var pinsOnMap;
   var activePinId;
 
   var slicePinId = function (id) {
@@ -27,10 +26,6 @@
     mainPinPoint.removeAttribute('style');
     window.map.mainPinPoint.style.left = MAIN_PIN_DEFAULT_LEFT + 'px';
     window.map.mainPinPoint.style.top = MAIN_PIN_DEFAULT_TOP + 'px';
-  };
-
-  var removeMainPinListener = function () {
-    mainPinPoint.removeEventListener('mouseup', window.init.initMain);
   };
 
   var pushPinsToMap = function (massiveObjects) {
@@ -75,34 +70,24 @@
     });
   };
 
-  var hideMapPins = function () {
-    document.querySelectorAll('.map__pin:not(.map__pin--main)').forEach(function (pin) {
-      pin.removeEventListener('click', function () {
-        window.changeCardData(slicePinId(pin.getAttribute('id')));
-
-
-        if (!window.card.showedCard === true) {
-          window.util.showElement(window.card.popupCard);
-          window.card.showedCard = true;
-        }
-
-
+  var removeMapPins = function () {
+    var mapPins = document.querySelectorAll('.map__pin:not(.map__pin--main)');
+    if (mapPins) {
+      mapPins.forEach(function (pin) {
+        pin.remove();
       });
-      window.util.hideElement(pin);
-    });
+    }
     mainPinPoint.removeEventListener('mouseup', window.init.initMain);
   };
 
   window.map = {
     slicePinId: slicePinId,
     mainPinPoint: mainPinPoint,
-    pinsOnMap: pinsOnMap,
     sizeMainPin: sizeMainPin,
     setMainPinDefault: setMainPinDefault,
-    removeMainPinListener: removeMainPinListener,
     pushPinsToMap: pushPinsToMap,
     showPins: showPins,
-    hideMapPins: hideMapPins,
+    removeMapPins: removeMapPins,
     addEventsPin: addEventsPin,
     changeActivePin: changeActivePin
   };

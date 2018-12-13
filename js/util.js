@@ -15,7 +15,7 @@
   };
 
 
-  var getArrayRandomSequence = function (massive) { // ?
+  var getArrayRandomSequence = function (massive) {
     var sequence = [];
     var randomIndex;
     var auxiliarySequence = getArraySequence(massive.length);
@@ -29,23 +29,23 @@
   };
 
 
-  var getLocationXOrY = function (min, max) { // ?
+  var getLocationXOrY = function (min, max) {
     return getRandomMinMax(min, max);
   };
 
 
-  var getRandomMinMax = function (min, max) { // ?
+  var getRandomMinMax = function (min, max) {
     var randomCount = Math.round(min + Math.random() * (max - min));
     return randomCount;
   };
 
 
-  var chooseRandomArrayItem = function (array) { // ?
+  var chooseRandomArrayItem = function (array) {
     return array[getRandomMinMax(0, array.length - 1)];
   };
 
 
-  var getArraySequence = function (max) { // ?
+  var getArraySequence = function (max) {
     var sequence = [];
     for (var index = 0; index < max; index++) {
       sequence[index] = index;
@@ -54,7 +54,7 @@
   };
 
 
-  var cropArray = function (massive, endIndex) { // ?
+  var cropArray = function (massive, endIndex) {
     var outputMassive = [];
     for (var i = 0; i < endIndex; i++) {
       outputMassive.push(massive[i]);

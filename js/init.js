@@ -10,50 +10,38 @@
     data.forEach(function (estateObject) {
       serverEstateData.push(estateObject);
     });
-    // window.estateData.estateObjects.push(data[i]);
-    // window.estateData.estateObjects = data;
-    // console.log(serverEstateData);
+    window.card.addHiddenCard();
+    window.map.pushPinsToMap(serverEstateData);
+    window.map.addEventsPin();
   };
 
   var onError = function (errorMessage) {
     viewMessage('#error', '.error', errorMessage);
+    window.backend.LOAD_STATUS = false;
   };
 
   window.form.disableForm();
-  window.form.setAdressDefault();
-  window.backend.makeGetServerRequest(onLoad, onError);
+  window.form.setDefaultAdress();
 
 
   var initMain = function () {
-    if (window.form.firstInit) {
-      window.card.addHiddenCard();
-      window.map.pushPinsToMap(serverEstateData);
-      window.map.addEventsPin();
-      window.form.firstInit = false;
-    } else {
-      window.map.showPins();
-    }
-    window.map.pinsOnMap = document.querySelectorAll('.map__pin:not(.map__pin--main)');
+    window.backend.makeServerRequest(onLoad, onError, 'GET');
     window.form.activateForm();
-    window.form.formStatus = true;
   };
 
 
   var setDefaultPage = function () {
+    window.map.removeMapPins();
+    window.map.setMainPinDefault();
+    window.form.setDefaultAdress();
     window.form.disableForm();
     window.form.formStatus = false;
-    window.map.hideMapPins();
     if (window.card.showedCard) {
       window.util.hideElement(document.querySelector('.map__card'));
       window.card.showedCard = false;
     }
-    window.map.setMainPinDefault();
-    window.form.setAdressDefault();
-  };
 
-  // var sendMessageTemplate = document.querySelector('#success').content;
-  // var erroorMessageTemplate = document.querySelector('#error').content;
-  // messageClass = '.success' or '.error'
+  };
 
   var viewMessage = function (templateClass, messageClass, text) {
     var fragmentMessage = document.createDocumentFragment();
@@ -68,7 +56,7 @@
 
     var documentKeyPressHandler = function (evt) {
       if (evt.keyCode === ESC_CODE) {
-        sendMessage.remove(); // parentNode.removeChild(sendMessage);
+        sendMessage.remove();
         document.removeEventListener('keypress', documentKeyPressHandler);
       }
     };
