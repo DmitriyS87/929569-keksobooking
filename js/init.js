@@ -3,6 +3,7 @@
 // модуль отвечает за общее состояние страницы
 
 (function () {
+
   var ESC_CODE = 27;
   var serverEstateData = [];
 
@@ -25,7 +26,7 @@
 
 
   var initMain = function () {
-    window.backend.makeServerRequest(onLoad, onError, 'GET');
+    window.backend.load(onLoad, onError);
     window.form.activateForm();
   };
 

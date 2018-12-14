@@ -1,9 +1,6 @@
 'use strict';
 
 (function () {
-
-  var LOAD_URL = 'https://js.dump.academy/keksobooking/data';
-  var SAVE_URL = 'https://js.dump.academy/keksobooking';
   var LOAD_TIMEOUT = 3000;
   var LOAD_STATUS = false;
 
@@ -28,7 +25,7 @@
     return xhr;
   };
 
-  var makeServerRequest = function (onLoad, onError, method, data) {
+  var makeServerRequest = function (onLoad, onError, method, URL, data) {
     var SUCCESS_CODE = 200;
     var ERROR_CODE = {
       400: 'Неверный запрос к серверу. Сообщите администратору сайта о проблеме при запросе данных от сервера',
@@ -36,14 +33,10 @@
       404: 'Ошибка при загрузке данных! Запрашиваемая инфомрация не найдена.',
     };
 
-    var URL;
     var xhr = createXhr(onError);
 
 
-    if (method === 'POST') {
-      URL = SAVE_URL;
-    } else {
-      URL = LOAD_URL;
+    if (method === 'GET') {
       xhr.responseType = 'json';
     }
 
@@ -92,9 +85,18 @@
     }
   };
 
+  var load = function (onLoad, onError) {
+    makeServerRequest(onLoad, onError, 'GET', 'https://js.dump.academy/keksobooking/data');
+  };
+
+  var save = function (onLoad, onError, data) {
+    makeServerRequest(onLoad, onError, 'POST', 'https://js.dump.academy/keksobooking', data);
+  };
+
+
   window.backend = {
-    makeServerRequest: makeServerRequest,
-    LOAD_TIMEOUT: LOAD_TIMEOUT,
-    LOAD_STATUS: LOAD_STATUS
+    LOAD_STATUS: LOAD_STATUS,
+    load: load,
+    save: save
   };
 })();

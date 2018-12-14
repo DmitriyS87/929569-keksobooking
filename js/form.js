@@ -125,7 +125,7 @@
     var submitData = function (evt) {
       evt.preventDefault();
       var data = new FormData(document.querySelector('.ad-form'));
-      window.backend.makeServerRequest(onLoad, onError, 'POST', data);
+      window.backend.save(onLoad, onError, data);
       return false;
     };
 
