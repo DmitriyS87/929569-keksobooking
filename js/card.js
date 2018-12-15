@@ -24,7 +24,7 @@
     window.util.hideElement(popupCard);
     showedCard = false;
     saveFeatures();
-    document.querySelector('.popup__photos').addEventListener('click', window.photoViewer.imgClickHandler);
+    // document.querySelector('.popup__photos').addEventListener('click', window.photoViewer.imgClickHandler);
   };
 
 

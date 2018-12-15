@@ -2,7 +2,6 @@
 
 (function () {
   var LOAD_TIMEOUT = 3000;
-  var LOAD_STATUS = false;
   var LOAD_URL = 'https://js.dump.academy/keksobooking/data';
   var SAVE_URL = 'https://js.dump.academy/keksobooking';
 
@@ -45,7 +44,6 @@
     var responseLoadHandler = function () {
       var error;
       if (xhr.status === SUCCESS_CODE) {
-        LOAD_STATUS = true;
         onLoad(xhr.response);
       } else {
         if (ERROR_CODE[xhr.status]) {
@@ -93,7 +91,6 @@
 
 
   window.backend = {
-    LOAD_STATUS: LOAD_STATUS,
     load: load,
     save: save
   };

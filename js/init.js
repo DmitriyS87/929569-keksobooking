@@ -18,7 +18,6 @@
 
   var onError = function (errorMessage) {
     viewMessage('#error', '.error', errorMessage);
-    window.backend.LOAD_STATUS = false;
   };
 
   window.form.disableForm();

@@ -5,6 +5,48 @@
 
   var formStatus = false;
 
+  var clearForm = function (form) {
+    if (form) {
+      var elements = form.elements;
+      form.reset();
+      for (var i = 0; i < elements.length; i++) {
+        var elementType = elements[i].type.toLowerCase();
+        switch (elementType) {
+          case 'text':
+          case 'textarea':
+          case 'number':
+            elements[i].value = '';
+            break;
+          case 'select-one':
+            //   console.log(i + '    ' + elements[i].selectedIndex);
+            var selectOptions = elements[i].options;
+            for (var j = 0; j < selectOptions.length; j++) {
+              if (selectOptions[j].defaultSelected) {
+                selectOptions.selectedIndex = j;
+                break;
+              }
+            }
+            //   console.log(i + '    ' + elements[i].selectedIndex);
+            break;
+            // case 'file':
+            //     elements[i].value = '';
+            //       break;
+            // case 'number':
+            //    elements[i].value = '';
+            //     break;
+          case 'checkbox':
+            if (elements[i].checked) {
+              elements[i].checked = false;
+            }
+            break;
+          default:
+            break;
+        }
+      }
+      changePrice();
+    }
+  };
+
   var putLocationAddress = function (address) {
     document.querySelector('#address').value = address;
   };
@@ -40,16 +82,21 @@
     formStatus = false;
   };
 
+  var changePrice = function () {
+    var estatePriceInput = document.querySelector('#price');
+    var minPrice = minPriceMap[document.querySelector('#type')[document.querySelector('#type').selectedIndex].textContent];
+    estatePriceInput.min = minPrice;
+    estatePriceInput.placeholder = minPrice;
+  };
 
+  var minPriceMap = {
+    'Квартира': 1000,
+    'Бунгало': 0,
+    'Дом': 5000,
+    'Дворец': 10000
+  };
   var activateForm = function () {
 
-
-    var minPriceMap = {
-      'Квартира': 1000,
-      'Бунгало': 0,
-      'Дом': 5000,
-      'Дворец': 10000
-    };
 
     var guestsByRoomsMap = {
       '1': ['1'],
@@ -70,12 +117,6 @@
     });
 
 
-    var changePrice = function () {
-      var minPrice = minPriceMap[estateTypeSelect[estateTypeSelect.selectedIndex].textContent];
-      estatePriceInput.min = minPrice;
-      estatePriceInput.placeholder = minPrice;
-    };
-
     var synchronizeCheckOut = function () {
       checkOutTimeSelect.selectedIndex = checkInTimeSelect.selectedIndex;
     };
@@ -85,7 +126,7 @@
     };
 
     var estateTypeSelect = document.querySelector('#type');
-    var estatePriceInput = document.querySelector('#price');
+    // var estatePriceInput = document.querySelector('#price');
     estateTypeSelect.addEventListener('change', changePrice);
 
     var addressInput = document.querySelector('#address');
@@ -117,9 +158,13 @@
     roomsSelect.addEventListener('change', synchronizeCapacity);
 
     var resetFormData = function (evt) {
+      // var resetButton = document.querySelector('.ad-form__reset');
       evt.preventDefault();
-      document.querySelector('.ad-form').reset();
+      clearForm(evt.target);
+      // document.querySelector('.ad-form').reset();
       window.init.setDefaultPage();
+      dataForm.removeEventListener('reset', resetFormData);
+      dataForm.removeEventListener('submit', submitData);
     };
 
     var submitData = function (evt) {
@@ -131,8 +176,8 @@
 
     var dataForm = document.querySelector('.ad-form');
     dataForm.classList.remove('ad-form--disabled');
-
-    dataForm.addEventListener('reset', resetFormData);
+    // var resetButton = document.querySelector('.ad-form__reset');
+    dataForm.addEventListener('reset', resetFormData); // !!! перевешать на кнопку и проверить
     dataForm.addEventListener('submit', submitData);
 
     window.form.formStatus = true;
@@ -143,6 +188,8 @@
     var text = 'Данные о Вашем объявлении успешно отправлены на сервер';
     document.querySelector('.ad-form__reset').click();
     window.init.viewMessage('#success', '.success', text);
+    var form = document.querySelector('.ad-form');
+    form.reset(); // !!!!!!
     window.init.setDefaultPage();
   };
 
