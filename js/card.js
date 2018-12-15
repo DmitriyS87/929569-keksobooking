@@ -10,7 +10,7 @@
   var templateCardImg;
   var popupCard;
   var cross;
-  var featuresDOMElements = [];
+  var featuresElements = [];
 
   var addHiddenCard = function () {
     var fragmentCard = document.createDocumentFragment();
@@ -23,14 +23,16 @@
     templateCardImg = popupCard.querySelector('.popup__photos img');
     window.util.hideElement(popupCard);
     showedCard = false;
-    saveFeaturesDOM();
+    saveFeatures();
+    document.querySelector('.popup__photos').addEventListener('click', window.photoViewer.imgClickHandler);
   };
 
-  var saveFeaturesDOM = function () {
+
+  var saveFeatures = function () {
     var featuresLi = popupCard.querySelectorAll('.popup__features li');
     for (var i = 0; i < featuresLi.length; i++) {
       featuresLi[i].textContent = FEATURES_VARIANTS[i];
-      featuresDOMElements[i] = featuresLi[i];
+      featuresElements[i] = featuresLi[i];
     }
   };
 
@@ -60,15 +62,13 @@
   var putFeaturesToCard = function (i) {
     window.util.removeChildrens(popupCard.querySelector('.popup__features'));
     var constructFeatures = function (item) {
-      featuresDOMElements.forEach(function (itemLi) {
+      featuresElements.forEach(function (itemLi) {
         if (itemLi.textContent === item) {
           popupCard.querySelector('.popup__features').appendChild(itemLi);
         }
       });
     };
-    if (estateObjects[i].offer.features.length > 0) {
-      estateObjects[i].offer.features.forEach(constructFeatures);
-    }
+    estateObjects[i].offer.features.forEach(constructFeatures);
 
   };
 
@@ -84,34 +84,9 @@
       photosFragment.appendChild(currentImgClone);
     };
 
-    if (estateObjects[index].offer.photos.length > 0) {
-      estateObjects[index].offer.photos.forEach(constructPhotos);
-      estatePhotosDiv.appendChild(photosFragment);
-      photosZoom();
-    }
-  };
+    estateObjects[index].offer.photos.forEach(constructPhotos);
+    estatePhotosDiv.appendChild(photosFragment);
 
-  var photosZoom = function () {
-    var message;
-    var templateZoomPhoto;
-
-    document.querySelectorAll('.popup__photos img').forEach(function (img) {
-      var imgClickHandler = function () {
-        message = document.querySelector('#zoomcardphoto').content;
-        templateZoomPhoto = message.cloneNode(true);
-        document.body.firstElementChild.appendChild(templateZoomPhoto);
-        document.querySelector('.card_photo img').src = img.src;
-        var zoomPhotoClickHandler = function () {
-          document.querySelector('.card_photo img').removeEventListener('click', zoomPhotoClickHandler);
-          document.querySelector('.card_photo').remove();
-        };
-
-        document.querySelector('.card_photo img').addEventListener('click', zoomPhotoClickHandler);
-
-      };
-      img.addEventListener('click', imgClickHandler);
-
-    });
   };
 
   var changeCardData = function (index) {

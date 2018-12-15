@@ -3,6 +3,8 @@
 (function () {
   var LOAD_TIMEOUT = 3000;
   var LOAD_STATUS = false;
+  var LOAD_URL = 'https://js.dump.academy/keksobooking/data';
+  var SAVE_URL = 'https://js.dump.academy/keksobooking';
 
   var createXhr = function (onError) {
     var xhr = false;
@@ -78,19 +80,15 @@
     xhr.addEventListener('timeout', responseTimeoutHandler);
 
     xhr.open(method, URL, true);
-    if (method === 'POST') {
-      xhr.send(data);
-    } else {
-      xhr.send();
-    }
+    xhr.send(data);
   };
 
   var load = function (onLoad, onError) {
-    makeServerRequest(onLoad, onError, 'GET', 'https://js.dump.academy/keksobooking/data');
+    makeServerRequest(onLoad, onError, 'GET', LOAD_URL);
   };
 
   var save = function (onLoad, onError, data) {
-    makeServerRequest(onLoad, onError, 'POST', 'https://js.dump.academy/keksobooking', data);
+    makeServerRequest(onLoad, onError, 'POST', SAVE_URL, data);
   };
 
 
