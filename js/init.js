@@ -16,9 +16,20 @@
     if (firstInit) {
       window.card.addHiddenCard();
       firstInit = false;
+      window.filtersForm.activateFilters();
     }
+    checkLoadedData(serverEstateData);
     window.map.pushPinsToMap(serverEstateData);
-    window.map.addEventsPin();
+    var filtredEstates = window.filtersForm.doFilterEstate(serverEstateData);
+    window.map.refreshMapPins(filtredEstates);
+  };
+
+  var checkLoadedData = function (estateData) {
+    estateData.forEach(function (estateObject, index) {
+      if (!estateObject.offer.title && !estateObject.offer.price && !estateObject.location.x && !estateObject.location.y) {
+        estateData = estateData.splice(index, 1);
+      }
+    });
   };
 
   var onError = function (errorMessage) {

@@ -6,7 +6,7 @@
 
   var MAIN_PIN_DEFAULT_LEFT = 570;
   var MAIN_PIN_DEFAULT_TOP = 375;
-
+  var SHOW_PINS_COUNT = 5;
   var activePinId;
 
   var slicePinId = function (id) {
@@ -31,16 +31,12 @@
   var pushPinsToMap = function (massiveObjects) {
     var fragmentPin = document.createDocumentFragment();
     var insertPlacePin = document.querySelector('.map__pins');
-    var i = 0;
-    massiveObjects.forEach(function (estateObject) {
-      if (estateObject.offer.title && estateObject.offer.price && estateObject.location.x && estateObject.location.y) {
-        fragmentPin.appendChild(window.pin.getNewPin(estateObject, i));
-        i++;
-      } else {
-        massiveObjects = massiveObjects.splice(i, 1);
-      }
+    massiveObjects.forEach(function (estateObject, i) {
+      fragmentPin.appendChild(window.pin.getNewPin(estateObject, i));
+      window.filtersForm.checkRefreshMap.push(i); // лишнее!!!!!
     });
     insertPlacePin.appendChild(fragmentPin);
+    addEventsPin();
   };
 
   var changeActivePin = function (pin) {
@@ -80,6 +76,22 @@
     mainPinPoint.removeEventListener('mouseup', window.init.initMain);
   };
 
+  var refreshMapPins = function (estateIndexes) {
+    var mapPins = document.querySelectorAll('.map__pin:not(.map__pin--main)');
+    // console.log(mapPins);
+    if (mapPins) {
+      mapPins.forEach(function (pin) {
+        // console.log(pin);
+        window.util.hideElement(pin);
+      });
+    }
+    for (var i = 0; i < SHOW_PINS_COUNT; i++) {
+      var pin = document.getElementById('pin' + estateIndexes[i]);
+      window.util.showElement(pin);
+    }
+    // window.init.serverEstateData;
+  };
+
   window.map = {
     slicePinId: slicePinId,
     mainPinPoint: mainPinPoint,
@@ -89,7 +101,8 @@
     showPins: showPins,
     removeMapPins: removeMapPins,
     addEventsPin: addEventsPin,
-    changeActivePin: changeActivePin
+    changeActivePin: changeActivePin,
+    refreshMapPins: refreshMapPins
   };
 })();
 

@@ -193,6 +193,7 @@
     // добавить функционал кнопке - попробывать еще раз?
   };
 
+
   window.form = {
     formStatus: formStatus,
     putLocationAddress: putLocationAddress,
@@ -201,5 +202,6 @@
     setDefaultAdress: setDefaultAdress,
     setElementEnabled: setElementEnabled,
     setElementDisabled: setElementDisabled,
+
   };
 })();
