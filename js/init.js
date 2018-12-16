@@ -6,13 +6,17 @@
 
   var ESC_CODE = 27;
   var serverEstateData = [];
+  var firstInit = true;
 
   var onLoad = function (data) {
     data.forEach(function (estateObject) {
       serverEstateData.push(estateObject);
     });
     window.form.activateForm();
-    window.card.addHiddenCard();
+    if (firstInit) {
+      window.card.addHiddenCard();
+      firstInit = false;
+    }
     window.map.pushPinsToMap(serverEstateData);
     window.map.addEventsPin();
   };

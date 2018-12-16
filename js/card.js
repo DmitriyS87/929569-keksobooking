@@ -25,7 +25,14 @@
     showedCard = false;
     saveFeatures();
     var cardPhotos = document.querySelector('.popup__photos');
-    window.photoViewer.setZoomPhotos(cardPhotos);
+    var imageClickHandler = function (evt) {
+      if (evt.target.tagName === 'IMG') {
+        window.photoViewer.showFullScreen(evt.target);
+      }
+    };
+    cardPhotos.addEventListener('click', imageClickHandler);
+
+
   };
 
 
