@@ -11,9 +11,11 @@
     data.forEach(function (estateObject) {
       serverEstateData.push(estateObject);
     });
+    window.form.activateForm();
     window.card.addHiddenCard();
     window.map.pushPinsToMap(serverEstateData);
     window.map.addEventsPin();
+
   };
 
   var onError = function (errorMessage) {
@@ -26,7 +28,6 @@
 
   var initMain = function () {
     window.backend.load(onLoad, onError);
-    window.form.activateForm();
   };
 
 

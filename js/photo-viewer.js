@@ -15,10 +15,12 @@
       document.querySelector('.card_photo img').addEventListener('click', zoomPhotoClickHandler);
     }
   };
-  // document.querySelector('.popup__photos').addEventListener('click', imgClickHandler);
+
+  var setZoomPhotos = function (photosContainer) {
+    photosContainer.addEventListener('click', imgClickHandler);
+  };
 
   window.photoViewer = {
-    imgClickHandler: imgClickHandler,
-    zoomPhotoClickHandler: zoomPhotoClickHandler
+    setZoomPhotos: setZoomPhotos
   };
 })();

@@ -24,7 +24,8 @@
     window.util.hideElement(popupCard);
     showedCard = false;
     saveFeatures();
-    // document.querySelector('.popup__photos').addEventListener('click', window.photoViewer.imgClickHandler);
+    var cardPhotos = document.querySelector('.popup__photos');
+    window.photoViewer.setZoomPhotos(cardPhotos);
   };
 
 
@@ -85,7 +86,7 @@
     };
 
     estateObjects[index].offer.photos.forEach(constructPhotos);
-    estatePhotosDiv.appendChild(photosFragment);
+    estatePhotosDiv.appendChild(photosFragment); // а что если картинки не заргужены?? как не отображать?
 
   };
 
