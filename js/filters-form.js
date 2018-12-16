@@ -86,13 +86,13 @@
           }
           return filtersCount[key].less;
         default:
-          console.log('default!!');
+          // console.log('default!!');
           return 0;
       }
     },
-    'guests': function (key, estateKey, filterKey) {
+    // 'guests': function (key, estateKey, filterKey) {
 
-    },
+    // },
   };
 
   var doFilterEstate = function (estates, filter) {
@@ -112,11 +112,11 @@
           }
         }
       } catch (err) {
-        console.log('tryCatch  ' + err);
+        // console.log('tryCatch  ' + err);
       }
       // console.log(estatesFiltersCost);
     }
-    console.log('here!' + estatesFiltersCost);
+    // console.log('here!' + estatesFiltersCost);
     return whatToReturn;
   };
 
@@ -183,7 +183,7 @@
       var currentFiltres = takefilters();
       var sortedEstates = doFilterEstate(window.init.serverEstateData, currentFiltres);
       window.map.refreshMapPins(sortedEstates);
-      console.log(currentFiltres);
+      // console.log(currentFiltres);
 
       /* if (massive.offer[filtresToProperties[key]]) {
         // selectedFiltres[key] = massive[key];
