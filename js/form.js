@@ -18,7 +18,6 @@
             elements[i].value = '';
             break;
           case 'select-one':
-            //   console.log(i + '    ' + elements[i].selectedIndex);
             var selectOptions = elements[i].options;
             for (var j = 0; j < selectOptions.length; j++) {
               if (selectOptions[j].defaultSelected) {
@@ -26,13 +25,12 @@
                 break;
               }
             }
-            //   console.log(i + '    ' + elements[i].selectedIndex);
             break;
             // case 'file':
-            //     elements[i].value = '';
+            //
             //       break;
             // case 'number':
-            //    elements[i].value = '';
+            //
             //     break;
           case 'checkbox':
             if (elements[i].checked) {
@@ -126,7 +124,6 @@
     };
 
     var estateTypeSelect = document.querySelector('#type');
-    // var estatePriceInput = document.querySelector('#price');
     estateTypeSelect.addEventListener('change', changePrice);
 
     var addressInput = document.querySelector('#address');
@@ -158,10 +155,8 @@
     roomsSelect.addEventListener('change', synchronizeCapacity);
 
     var resetFormData = function (evt) {
-      // var resetButton = document.querySelector('.ad-form__reset');
       evt.preventDefault();
       clearForm(evt.target);
-      // document.querySelector('.ad-form').reset();
       window.init.setDefaultPage();
       dataForm.removeEventListener('reset', resetFormData);
       dataForm.removeEventListener('submit', submitData);
@@ -176,8 +171,8 @@
 
     var dataForm = document.querySelector('.ad-form');
     dataForm.classList.remove('ad-form--disabled');
-    // var resetButton = document.querySelector('.ad-form__reset');
-    dataForm.addEventListener('reset', resetFormData); // !!! перевешать на кнопку и проверить
+
+    dataForm.addEventListener('reset', resetFormData);
     dataForm.addEventListener('submit', submitData);
 
     window.form.formStatus = true;
@@ -189,7 +184,7 @@
     document.querySelector('.ad-form__reset').click();
     window.init.viewMessage('#success', '.success', text);
     var form = document.querySelector('.ad-form');
-    form.reset(); // !!!!!!
+    clearForm(form);
     window.init.setDefaultPage();
   };
 
