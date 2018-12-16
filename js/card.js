@@ -82,6 +82,10 @@
     var constructPhotos = function (item) {
       var currentImgClone = templateCardImg.cloneNode(true);
       currentImgClone.src = item;
+      window.util.hideElement(currentImgClone);
+      currentImgClone.addEventListener('load', function (evt) {
+        window.util.showElement(evt.target);
+      });
       photosFragment.appendChild(currentImgClone);
     };
 

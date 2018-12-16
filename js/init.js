@@ -15,7 +15,6 @@
     window.card.addHiddenCard();
     window.map.pushPinsToMap(serverEstateData);
     window.map.addEventsPin();
-
   };
 
   var onError = function (errorMessage) {
