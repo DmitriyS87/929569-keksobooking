@@ -4,38 +4,80 @@
 
 (function () {
 
+  var ESC_CODE = 27;
+  var serverEstateData = [];
+  var firstInit = true;
+
+  var onLoad = function (data) {
+    data.forEach(function (estateObject) {
+      serverEstateData.push(estateObject);
+    });
+    window.form.activateForm();
+    if (firstInit) {
+      window.card.addHiddenCard();
+      firstInit = false;
+    }
+    window.map.pushPinsToMap(serverEstateData);
+    window.map.addEventsPin();
+  };
+
+  var onError = function (errorMessage) {
+    viewMessage('#error', '.error', errorMessage);
+  };
+
   window.form.disableForm();
-  window.form.setAdressDefault();
+  window.form.setDefaultAdress();
+
 
   var initMain = function () {
-    if (window.form.firstInit) {
-      window.card.addHiddenCard();
-      window.map.pushPinsToMap(window.estateData.estateObjects);
-      window.map.addEventsPin();
-      window.form.firstInit = false;
-    } else {
-      window.map.showPins();
-    }
-    window.map.pinsOnMap = document.querySelectorAll('.map__pin:not(.map__pin--main)');
-    window.form.activateForm();
-    window.form.formStatus = true;
+    window.backend.load(onLoad, onError);
   };
 
 
   var setDefaultPage = function () {
+    window.map.removeMapPins();
+    window.map.setMainPinDefault();
+    window.form.setDefaultAdress();
     window.form.disableForm();
     window.form.formStatus = false;
-    window.map.hideMapPins();
     if (window.card.showedCard) {
       window.util.hideElement(document.querySelector('.map__card'));
       window.card.showedCard = false;
     }
-    window.map.setMainPinDefault();
-    window.form.setAdressDefault();
 
   };
+
+  var viewMessage = function (templateClass, messageClass, text) {
+    var fragmentMessage = document.createDocumentFragment();
+    var templateMessage = document.querySelector(templateClass).content;
+    fragmentMessage.appendChild(templateMessage.cloneNode(true));
+    document.body.firstElementChild.appendChild(fragmentMessage);
+
+    var sendMessage = document.querySelector(messageClass);
+    if (text) {
+      sendMessage.querySelector('p').textContent = text;
+    }
+
+    var documentKeyPressHandler = function (evt) {
+      if (evt.keyCode === ESC_CODE) {
+        sendMessage.remove();
+        document.removeEventListener('keypress', documentKeyPressHandler);
+      }
+    };
+
+    document.addEventListener('keypress', documentKeyPressHandler);
+
+    sendMessage.addEventListener('click', function () {
+      sendMessage.remove();
+      document.removeEventListener('keypress', documentKeyPressHandler);
+    });
+  };
+
+
   window.init = {
     initMain: initMain,
-    setDefaultPage: setDefaultPage
+    setDefaultPage: setDefaultPage,
+    viewMessage: viewMessage,
+    serverEstateData: serverEstateData
   };
 })();

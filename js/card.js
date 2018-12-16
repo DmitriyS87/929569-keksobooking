@@ -1,15 +1,16 @@
 'use strict';
 
 (function () {
-
+  var FEATURES_VARIANTS = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
 
   var showedCard = false;
 
-  var estateObjects = window.estateData.estateObjects;
+  var estateObjects = window.init.serverEstateData;
   var templateCard = document.querySelector('#card').content;
-
+  var templateCardImg;
   var popupCard;
   var cross;
+  var featuresElements = [];
 
   var addHiddenCard = function () {
     var fragmentCard = document.createDocumentFragment();
@@ -19,12 +20,33 @@
     popupCard = document.querySelector('.map__card');
     cross = popupCard.querySelector('.popup__close');
     cross.addEventListener('click', crossClickHandler);
+    templateCardImg = popupCard.querySelector('.popup__photos img');
     window.util.hideElement(popupCard);
     showedCard = false;
+    saveFeatures();
+    var cardPhotos = document.querySelector('.popup__photos');
+    var imageClickHandler = function (evt) {
+      if (evt.target.tagName === 'IMG') {
+        window.photoViewer.showFullScreen(evt.target);
+      }
+    };
+    cardPhotos.addEventListener('click', imageClickHandler);
+
+
+  };
+
+
+  var saveFeatures = function () {
+    var featuresLi = popupCard.querySelectorAll('.popup__features li');
+    for (var i = 0; i < featuresLi.length; i++) {
+      featuresLi[i].textContent = FEATURES_VARIANTS[i];
+      featuresElements[i] = featuresLi[i];
+    }
   };
 
   var crossClickHandler = function () {
     window.util.hideElement(popupCard);
+    window.map.changeActivePin();
     showedCard = false;
   };
 
@@ -44,11 +66,39 @@
     }
   };
 
+
   var putFeaturesToCard = function (i) {
-    var featuresLi = popupCard.querySelectorAll('.popup__features li');
-    for (var j = 0; j < estateObjects[i].offer.features.length; j++) {
-      featuresLi[j].textContent = estateObjects[i].offer.features;
-    }
+    window.util.removeChildrens(popupCard.querySelector('.popup__features'));
+    var constructFeatures = function (item) {
+      featuresElements.forEach(function (itemLi) {
+        if (itemLi.textContent === item) {
+          popupCard.querySelector('.popup__features').appendChild(itemLi);
+        }
+      });
+    };
+    estateObjects[i].offer.features.forEach(constructFeatures);
+
+  };
+
+  var putPhotosToCard = function (index) {
+
+    var estatePhotosDiv = popupCard.querySelector('.popup__photos');
+    var photosFragment = document.createDocumentFragment();
+    window.util.removeChildrens(estatePhotosDiv);
+
+    var constructPhotos = function (item) {
+      var currentImgClone = templateCardImg.cloneNode(true);
+      currentImgClone.src = item;
+      window.util.hideElement(currentImgClone);
+      currentImgClone.addEventListener('load', function (evt) {
+        window.util.showElement(evt.target);
+      });
+      photosFragment.appendChild(currentImgClone);
+    };
+
+    estateObjects[index].offer.photos.forEach(constructPhotos);
+    estatePhotosDiv.appendChild(photosFragment); // а что если картинки не заргужены?? как не отображать?
+
   };
 
   var changeCardData = function (index) {
@@ -75,15 +125,9 @@
     putFeaturesToCard(index);
 
     popupCard.querySelector('.popup__description').textContent = estateObjects[index].offer.description;
-    var estatePhotosDiv = popupCard.querySelector('.popup__photos');
-    var estateOfferPictures = popupCard.querySelector('.popup__photos img');
-    window.util.removeChildrens(estatePhotosDiv);
 
-    for (var k = 0; k < estateObjects[index].offer.photos.length; k++) {
-      var currentImgClone = estateOfferPictures.cloneNode(true);
-      currentImgClone.src = estateObjects[index].offer.photos[k];
-      estatePhotosDiv.appendChild(currentImgClone);
-    }
+    putPhotosToCard(index);
+
     popupCard.querySelector('.popup__avatar').src = estateObjects[index].author.avatar;
   };
 

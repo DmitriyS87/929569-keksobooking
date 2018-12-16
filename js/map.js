@@ -7,11 +7,10 @@
   var MAIN_PIN_DEFAULT_LEFT = 570;
   var MAIN_PIN_DEFAULT_TOP = 375;
 
-  var pinsOnMap;
+  var activePinId;
 
-
-  var slicePinId = function (name) {
-    return parseInt(name.slice(3), 10);
+  var slicePinId = function (id) {
+    return parseInt(id.slice(3), 10);
   };
 
   var mainPinPoint = document.querySelector('.map__pin--main');
@@ -29,23 +28,36 @@
     window.map.mainPinPoint.style.top = MAIN_PIN_DEFAULT_TOP + 'px';
   };
 
-  var removeMainPinListener = function () {
-    mainPinPoint.removeEventListener('mouseup', window.init.initMain);
-  };
-
   var pushPinsToMap = function (massiveObjects) {
     var fragmentPin = document.createDocumentFragment();
     var insertPlacePin = document.querySelector('.map__pins');
-    for (var i = 0; i < massiveObjects.length; i++) {
-      fragmentPin.appendChild(window.pin.getNewPin(massiveObjects[i], i));
-    }
+    var i = 0;
+    massiveObjects.forEach(function (estateObject) {
+      if (estateObject.offer.title && estateObject.offer.price && estateObject.location.x && estateObject.location.y) {
+        fragmentPin.appendChild(window.pin.getNewPin(estateObject, i));
+        i++;
+      } else {
+        massiveObjects = massiveObjects.splice(i, 1);
+      }
+    });
     insertPlacePin.appendChild(fragmentPin);
+  };
+
+  var changeActivePin = function (pin) {
+    if (activePinId) {
+      document.getElementById(activePinId).classList.remove('.map__pin--active');
+    }
+    if (pin) {
+      pin.classList.add('.map__pin--active');
+    }
   };
 
   var addEventsPin = function () {
     document.querySelectorAll('.map__pin:not(.map__pin--main)').forEach(function (pin) {
       pin.addEventListener('click', function () {
-        window.card.changeCardData(window.map.slicePinId(pin.getAttribute('name')));
+        changeActivePin(pin);
+        activePinId = pin.getAttribute('id');
+        window.card.changeCardData(slicePinId(activePinId));
         window.util.showElement(document.querySelector('.map__card'));
         window.card.showedCard = true;
       });
@@ -58,35 +70,26 @@
     });
   };
 
-  var hideMapPins = function () {
-    document.querySelectorAll('.map__pin:not(.map__pin--main)').forEach(function (pin) {
-      pin.removeEventListener('click', function () {
-        window.changeCardData(slicePinId(pin.getAttribute('name')));
-
-
-        if (!window.card.showedCard === true) {
-          window.util.showElement(window.card.popupCard);
-          window.card.showedCard = true;
-        }
-
-
+  var removeMapPins = function () {
+    var mapPins = document.querySelectorAll('.map__pin:not(.map__pin--main)');
+    if (mapPins) {
+      mapPins.forEach(function (pin) {
+        pin.remove();
       });
-      window.util.hideElement(pin);
-    });
+    }
     mainPinPoint.removeEventListener('mouseup', window.init.initMain);
   };
 
   window.map = {
     slicePinId: slicePinId,
     mainPinPoint: mainPinPoint,
-    pinsOnMap: pinsOnMap,
     sizeMainPin: sizeMainPin,
     setMainPinDefault: setMainPinDefault,
-    removeMainPinListener: removeMainPinListener,
     pushPinsToMap: pushPinsToMap,
     showPins: showPins,
-    hideMapPins: hideMapPins,
-    addEventsPin: addEventsPin
+    removeMapPins: removeMapPins,
+    addEventsPin: addEventsPin,
+    changeActivePin: changeActivePin
   };
 })();
 

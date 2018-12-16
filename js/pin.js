@@ -10,7 +10,7 @@
 
     var styleText = 'left:' + estateObject.location.x + 'px; top:' + estateObject.location.y + 'px;';
     firstTag.style.cssText = styleText;
-    firstTag.setAttribute('name', 'pin' + number);
+    firstTag.setAttribute('id', 'pin' + number);
     secondTag.src = estateObject.author.avatar;
     secondTag.alt = estateObject.offer.title;
 

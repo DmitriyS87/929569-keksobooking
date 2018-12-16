@@ -2,20 +2,55 @@
 
 
 (function () {
-  var LOCATION_Y_MIN = 130;
-  var LOCATION_X_MIN = 0;
 
-  var formStatus = false; // ?
-  var firstInit = true;
+  var formStatus = false;
 
-  var putLocationAddress = function (address) { // ?
-    address[0] += LOCATION_X_MIN;
-    address[1] += LOCATION_Y_MIN;
+  var clearForm = function (form) {
+    if (form) {
+      var elements = form.elements;
+      form.reset();
+      for (var i = 0; i < elements.length; i++) {
+        var elementType = elements[i].type.toLowerCase();
+        switch (elementType) {
+          case 'text':
+          case 'textarea':
+          case 'number':
+            elements[i].value = '';
+            break;
+          case 'select-one':
+            var selectOptions = elements[i].options;
+            for (var j = 0; j < selectOptions.length; j++) {
+              if (selectOptions[j].defaultSelected) {
+                selectOptions.selectedIndex = j;
+                break;
+              }
+            }
+            break;
+            // case 'file':
+            //
+            //       break;
+            // case 'number':
+            //
+            //     break;
+          case 'checkbox':
+            if (elements[i].checked) {
+              elements[i].checked = false;
+            }
+            break;
+          default:
+            break;
+        }
+      }
+      changePrice();
+    }
+  };
+
+  var putLocationAddress = function (address) {
     document.querySelector('#address').value = address;
   };
 
 
-  var setAdressDefault = function () {
+  var setDefaultAdress = function () {
     document.querySelector('#address').value = [window.map.sizeMainPin.defaultX, window.map.sizeMainPin.defaultY];
   };
 
@@ -30,168 +65,141 @@
 
 
   var disableForm = function () {
-    if (!formStatus) {
-      var formHeaderFildset = document.querySelector('.ad-form-header');
-      setElementDisabled(formHeaderFildset);
-      var elementsFieldset = document.querySelectorAll('.ad-form__element');
-      elementsFieldset.forEach(function (element) {
-        setElementDisabled(element);
+    var formHeaderFildset = document.querySelector('.ad-form-header');
+    setElementDisabled(formHeaderFildset);
+    var formFilters = document.querySelector('.map__filters');
+    formFilters.classList.add('ad-form--disabled');
+    setElementDisabled(formFilters);
+    var elementsFieldset = document.querySelectorAll('.ad-form__element');
+    elementsFieldset.forEach(function (element) {
+      setElementDisabled(element);
+    });
+    document.querySelector('.ad-form').classList.add('ad-form--disabled');
+    document.querySelector('.map').classList.add('map--faded');
+
+    formStatus = false;
+  };
+
+  var changePrice = function () {
+    var estatePriceInput = document.querySelector('#price');
+    var minPrice = minPriceMap[document.querySelector('#type')[document.querySelector('#type').selectedIndex].textContent];
+    estatePriceInput.min = minPrice;
+    estatePriceInput.placeholder = minPrice;
+  };
+
+  var minPriceMap = {
+    'Квартира': 1000,
+    'Бунгало': 0,
+    'Дом': 5000,
+    'Дворец': 10000
+  };
+  var activateForm = function () {
+
+
+    var guestsByRoomsMap = {
+      '1': ['1'],
+      '2': ['1', '2'],
+      '3': ['1', '2', '3'],
+      '100': ['0']
+    };
+
+    var formHeaderFildset = document.querySelector('.ad-form-header');
+    setElementEnabled(formHeaderFildset);
+    var formFilters = document.querySelector('.map__filters');
+    formFilters.classList.remove('ad-form--disabled');
+    setElementEnabled(formFilters);
+    document.querySelector('.map').classList.remove('map--faded');
+    var elementsFieldset = document.querySelectorAll('.ad-form__element');
+    elementsFieldset.forEach(function (element) {
+      setElementEnabled(element);
+    });
+
+
+    var synchronizeCheckOut = function () {
+      checkOutTimeSelect.selectedIndex = checkInTimeSelect.selectedIndex;
+    };
+
+    var synchronizeCheckIn = function () {
+      checkInTimeSelect.selectedIndex = checkOutTimeSelect.selectedIndex;
+    };
+
+    var estateTypeSelect = document.querySelector('#type');
+    estateTypeSelect.addEventListener('change', changePrice);
+
+    var addressInput = document.querySelector('#address');
+    addressInput.setAttribute('readonly', 'readonly');
+
+    var checkInTimeSelect = document.querySelector('#timein');
+    checkInTimeSelect.addEventListener('change', synchronizeCheckOut);
+
+    var checkOutTimeSelect = document.querySelector('#timeout');
+    checkOutTimeSelect.addEventListener('change', synchronizeCheckIn);
+
+
+    var synchronizeCapacity = function () {
+
+      var capacity = document.querySelector('#capacity');
+      var selectedIndxvalue = roomsSelect[roomsSelect.selectedIndex].value;
+
+      for (var k = 0; k < capacity.children.length; k++) {
+        capacity.children[k].disabled = true;
+      }
+
+      guestsByRoomsMap[selectedIndxvalue].forEach(function (optionValue) {
+        capacity.querySelector('[value = \'' + optionValue + '\']').disabled = false;
       });
-      document.querySelector('.ad-form').classList.add('ad-form--disabled');
-      formStatus = false;
-    }
+
+    };
+
+    var roomsSelect = document.querySelector('#room_number');
+    roomsSelect.addEventListener('change', synchronizeCapacity);
+
+    var resetFormData = function (evt) {
+      evt.preventDefault();
+      clearForm(evt.target);
+      window.init.setDefaultPage();
+      dataForm.removeEventListener('reset', resetFormData);
+      dataForm.removeEventListener('submit', submitData);
+    };
+
+    var submitData = function (evt) {
+      evt.preventDefault();
+      var data = new FormData(document.querySelector('.ad-form'));
+      window.backend.save(onLoad, onError, data);
+      return false;
+    };
+
+    var dataForm = document.querySelector('.ad-form');
+    dataForm.classList.remove('ad-form--disabled');
+
+    dataForm.addEventListener('reset', resetFormData);
+    dataForm.addEventListener('submit', submitData);
+
+    window.form.formStatus = true;
   };
 
 
-  var activateForm = function () {
-    if (!formStatus) {
-      var formHeaderFildset = document.querySelector('.ad-form-header');
-      setElementEnabled(formHeaderFildset);
-      var elementsFieldset = document.querySelectorAll('.ad-form__element');
-      elementsFieldset.forEach(function (element) {
-        setElementEnabled(element);
-      });
+  var onLoad = function () {
+    var text = 'Данные о Вашем объявлении успешно отправлены на сервер';
+    document.querySelector('.ad-form__reset').click();
+    window.init.viewMessage('#success', '.success', text);
+    var form = document.querySelector('.ad-form');
+    clearForm(form);
+    window.init.setDefaultPage();
+  };
 
-      var getMinPrice = function (index) {
-        switch (estateTypeSelect.item(index).textContent) {
-          case 'Квартира':
-            return 1000;
-          case 'Бунгало':
-            return 0;
-          case 'Дом':
-            return 5000;
-          case 'Дворец':
-            return 10000;
-          default:
-            return 1000;
-        }
-      };
-
-      var changePrice = function () {
-        var minPrice = getMinPrice(estateTypeSelect.selectedIndex);
-        estatePriceInput.min = minPrice;
-        estatePriceInput.placeholder = minPrice;
-      };
-
-      var synchronizeCheckOut = function () {
-        checkOutTimeSelect.selectedIndex = checkInTimeSelect.selectedIndex;
-      };
-
-      var synchronizeCheckIn = function () {
-        checkInTimeSelect.selectedIndex = checkOutTimeSelect.selectedIndex;
-      };
-
-      var estateTypeSelect = document.querySelector('#type');
-      var estatePriceInput = document.querySelector('#price');
-      estateTypeSelect.addEventListener('change', changePrice);
-
-      var addressInput = document.querySelector('#address');
-      addressInput.setAttribute('readonly', 'readonly');
-
-      var checkInTimeSelect = document.querySelector('#timein');
-      checkInTimeSelect.addEventListener('change', synchronizeCheckOut);
-
-      var checkOutTimeSelect = document.querySelector('#timeout');
-      checkOutTimeSelect.addEventListener('change', synchronizeCheckIn);
-
-      var getNumberGuestsByRooms = function (rule) {
-        switch (rule) {
-          case 0:
-            return '1';
-          case 1:
-            return '2';
-          case 2:
-            return '3';
-          case 3:
-            return '0';
-          default:
-            return '3';
-        }
-      };
-
-      var synchronizeCapacity = function () {
-        var selectedIndx = roomsSelect.selectedIndex;
-        var ruleIndex = parseInt(getNumberGuestsByRooms(selectedIndx), 10);
-        for (var k = 0; k < capacity.options.length; k++) {
-          if (k < ruleIndex) {
-            capacity.querySelector('[value = \'' + getNumberGuestsByRooms(k) + '\']').disabled = false;
-          } else if (ruleIndex === 0 && k === 3) {
-            capacity.querySelector('[value = \'' + getNumberGuestsByRooms(k) + '\']').disabled = false;
-          } else {
-            capacity.querySelector('[value = \'' + getNumberGuestsByRooms(k) + '\']').disabled = true;
-          }
-        }
-      };
-
-      var roomsSelect = document.querySelector('#room_number');
-      var capacity = document.querySelector('#capacity');
-      roomsSelect.addEventListener('change', synchronizeCapacity);
-
-      var submitElement = document.querySelector('.ad-form__submit');
-
-      var submitData = function (evt) {
-        evt.preventDefault();
-        /*    for (var i = 0; i < formElement.elements.length; i++) {
-          formElement.elements[i].validity
-        }
-
-        if (evt.callback === 'sucess') {
-          viewSendMessage();
-        }
-        if (evt.callback === 'error') {
-          viewErrorMessage();
-        }
-        */
-        return false;
-      };
-      submitElement.addEventListener('click', submitData);
-    }
-
-
-    /*
-    var viewSendMessage = function () {
-      var sendMessageTemplate = document.querySelector('#success').content;
-      var fragmentSuccess = document.createDocumentFragment();
-      fragmentSuccess.appendChild(sendMessageTemplate);
-      document.body.firstElementChild.appendChild(fragmentSuccess);
-      sendMessage = document.querySelector('.success');
-
-      sendMessage.addEventListener('keypress', function (evt) {
-        if (evt.keyCode === ESC_CODE) {
-          deleteMsg(sendMessage);
-        }
-      });
-      sendMessage.addEventListener('click', function () {
-        deleteMsg(sendMessage);
-        removeClickListner();
-      });
-    };
-
-    var viewErrorMessage = function () {
-      var erroorMessageTemplate = document.querySelector('#error').content;
-      var fragmentError = document.createDocumentFragment();
-      fragmentError.appendChild(erroorMessageTemplate);
-      document.body.firstElementChild.appendChild(fragmentError);
-    };
-    target="_blank"
-   */
-    var resetElement = document.querySelector('.ad-form__reset');
-    resetElement.addEventListener('click', window.init.setDefaultPage);
-    var formElement = document.querySelector('.ad-form');
-    formElement.classList.remove('ad-form--disabled');
-    formElement.addEventListener('reset', setAdressDefault);
-    // formElement.addEventListener('submit', submitData);
-
+  var onError = function (errorMessage) {
+    window.init.viewMessage('#error', '.error', errorMessage);
+    // добавить функционал кнопке - попробывать еще раз?
   };
 
   window.form = {
     formStatus: formStatus,
-    firstInit: firstInit,
     putLocationAddress: putLocationAddress,
     disableForm: disableForm,
     activateForm: activateForm,
-    setAdressDefault: setAdressDefault,
+    setDefaultAdress: setDefaultAdress,
     setElementEnabled: setElementEnabled,
-    setElementDisabled: setElementDisabled
+    setElementDisabled: setElementDisabled,
   };
 })();

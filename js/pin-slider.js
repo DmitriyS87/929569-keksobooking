@@ -8,7 +8,9 @@
   var LOCATION_Y_MAX = 630;
   var LOCATION_X_MIN = 0;
 
-  var PIN_WIDTH = 50;
+  var PIN_WIDTH = 65;
+  var PIN_SHARP_END_X = 32;
+  var PIN_SHARP_END_Y = 84;
 
   var getPinMaxX = function () {
     var insertPlacePin = document.querySelector('.map__pins');
@@ -23,7 +25,7 @@
 
   var mainPinMousedownHandler = function (evt) {
 
-    var isDragged = true;
+    var isDragged = false;
 
 
     defaultPosition = {
@@ -31,26 +33,26 @@
       y: parseInt(getComputedStyle(mainPinPoint).top, 10)
     };
 
-    var downUpCords = {
+    var downCords = {
       downX: evt.clientX,
       downY: evt.clientY,
     };
 
     var differenceCords = {
-      shiftX: downUpCords.downX - defaultPosition.x,
-      shiftY: downUpCords.downY - defaultPosition.y
+      shiftX: downCords.downX - defaultPosition.x,
+      shiftY: downCords.downY - defaultPosition.y
     };
 
     var mainPinMousemoveHandler = function (evtMove) {
 
-      if (isDragged) {
+      if (!isDragged) {
 
-        var moveX = evtMove.clientX - downUpCords.downX;
-        var moveY = evtMove.clientY - downUpCords.downY;
+        var moveX = evtMove.clientX - downCords.downX;
+        var moveY = evtMove.clientY - downCords.downY;
         if (Math.abs(moveX) < MOVE_SENSIVITY && Math.abs(moveY) < MOVE_SENSIVITY) {
           return;
         } else {
-          isDragged = false;
+          isDragged = true;
         }
 
         mainPinPoint.style.zIndex = 9999;
@@ -66,38 +68,29 @@
       if (moveX < LOCATION_X_MIN) {
         moveX = LOCATION_X_MIN;
       }
-      if (moveY > LOCATION_Y_MAX) {
-        moveY = LOCATION_Y_MAX;
+      if (moveY > (LOCATION_Y_MAX - PIN_SHARP_END_Y / 2)) {
+        moveY = LOCATION_Y_MAX - PIN_SHARP_END_Y / 2;
       }
-      if (moveY < LOCATION_Y_MIN) {
-        moveY = LOCATION_Y_MIN;
+      if (moveY < LOCATION_Y_MIN - PIN_SHARP_END_Y / 2) {
+        moveY = LOCATION_Y_MIN - PIN_SHARP_END_Y / 2;
       }
 
 
       mainPinPoint.style.left = moveX + 'px';
       mainPinPoint.style.top = moveY + 'px';
 
-      downUpCords.upX = moveX;
-      downUpCords.upY = moveY;
-
-      window.form.putLocationAddress([moveX, moveY]);
+      window.form.putLocationAddress([moveX + PIN_SHARP_END_X, moveY + PIN_SHARP_END_Y / 2]);
 
     };
 
     document.addEventListener('mousemove', mainPinMousemoveHandler);
 
 
-    var mainPinMouseupHandler = function (evtUp) {
-      if (!isDragged) {
-        mainPinPoint.style.left = downUpCords.upX;
-        mainPinPoint.style.top = downUpCords.upY;
-
+    var mainPinMouseupHandler = function () {
+      if (isDragged) {
         if (!window.form.formStatus) {
           window.init.initMain();
-          window.form.putLocationAddress([evtUp.clientX, evtUp.clientY]);
         }
-      } else {
-        window.form.putLocationAddress([evtUp.clientX, evtUp.clientY]);
       }
 
       document.removeEventListener('mousemove', mainPinMousemoveHandler);
