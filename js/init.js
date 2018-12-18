@@ -12,16 +12,16 @@
     data.forEach(function (estateObject) {
       serverEstateData.push(estateObject);
     });
+    checkLoadedData(serverEstateData);
     window.form.activateForm();
     if (firstInit) {
       window.card.addHiddenCard();
       firstInit = false;
-      window.filtersForm.activateFilters();
+      window.filtersForm.activateFilters(serverEstateData);
     }
-    checkLoadedData(serverEstateData);
-    window.map.pushPinsToMap(serverEstateData);
-    var filtredEstates = window.filtersForm.doFilterEstate(serverEstateData);
-    window.map.refreshMapPins(filtredEstates);
+    window.map.pushPinsToMap(serverEstateData); // передать данные через модуль фильтра??? ГОВ.фильтр.колбэк??
+    // var filtredEstates = window.filtersForm.doFilterEstate(serverEstateData);
+  //  window.map.refreshMapPins(filtredEstates);
   };
 
   var checkLoadedData = function (estateData) {

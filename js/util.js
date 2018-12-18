@@ -2,6 +2,21 @@
 
 (function () {
 
+  var getSubString = function (str, devider) {
+    return str.substring(str.indexOf(devider)).slice(1);
+  };
+
+  var getEmtyArray = function (sizeI, sizeJ) {
+    var arrayIJ = [];
+    for (var i = 0; i < sizeI; i++) {
+      arrayIJ[i] = [];
+      for (var j = 0; j < sizeJ; j++) {
+        arrayIJ[i][j] = 0;
+      }
+    }
+    return arrayIJ;
+  };
+
   var hideElement = function (element) {
     element.classList.add('hidden');
   };
@@ -72,7 +87,9 @@
     chooseRandomArrayItem: chooseRandomArrayItem,
     getArraySequence: getArraySequence,
     cropArray: cropArray,
-    getArrayRandomSequence: getArrayRandomSequence
+    getArrayRandomSequence: getArrayRandomSequence,
+    getEmtyArray: getEmtyArray,
+    getSubString: getSubString
   };
 
 })();

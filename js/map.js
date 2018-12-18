@@ -33,7 +33,7 @@
     var insertPlacePin = document.querySelector('.map__pins');
     massiveObjects.forEach(function (estateObject, i) {
       fragmentPin.appendChild(window.pin.getNewPin(estateObject, i));
-      window.filtersForm.checkRefreshMap.push(i); // лишнее!!!!!
+      // window.filtersForm.checkRefreshMap.push(i); // лишнее!!!!!
     });
     insertPlacePin.appendChild(fragmentPin);
     addEventsPin();

@@ -1,289 +1,344 @@
 'use strict';
 
 (function () {
-  var checkRefreshMap = [];
   var MIDDLE_PRICE = 10000;
   var HIGH_PRICE = 50000;
+  var FILTERS_COUNT = 9;
 
-  var filtersCount = {
+  var TYPES_FILTERS_VALUE = ['palace', 'flat', 'house', 'bungalo'];
+  var PRICE_FILTERS_VALUE = ['low', 'middle', 'high'];
+  var ROOMS_FILTERS_VALUE = ['1', '2', '3'];
+  var GUESTS_FILTERS_VALUE = ['0', '1', '2'];
+  var FEATURES_FILTERS_VALUE = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
+  var NUMEROUS_FILTERS_RESISTANCE = 1;
+
+  var estatesRating = [];
+  var estatesFiltresValues = [];
+  var beginRatingConditions = [];
+
+  var filtersConditions = [];
+  var zeroConditions = [];
+
+  var filtersCountsCosts = {
     'type': {
-      same: 10,
-      no: 0},
+      same: 100,
+      no: 0
+    },
     'price': {
-      same: 10,
+      same: 100,
       unclose: 0,
-      close: 5},
+      close: 50
+    },
     'rooms': {
-      same: 5,
-      less: 1,
-      more: 3},
+      same: 60,
+      unclose: 0,
+      close: 40
+    },
     'guests': {
-      same: 5,
-      more: 3,
-      less: 2,
-      noone: 0},
-    'wifi': 0.3,
-    'dishwasher': 0.3,
-    'parking': 0.3,
-    'washer': 0.3,
-    'elevator': 0.3,
-    'conditioner': 0.3,
-  };
-
-  var countDifferenceCost = {
-    'type': function (key, estateKey, filterKey) {
-      if (estateKey === filterKey) {
-        return filtersCount[key].same;
-      }
-      return filtersCount[key].no;
+      same: 60,
+      close: 40,
+      unclose: 0
     },
-    'price': function (key, estateCount, filterKey) {
-      switch (filterKey) {
-        case 'low': if (estateCount <= MIDDLE_PRICE) {
-          return filtersCount[key].same;
-        } else if (estateCount < HIGH_PRICE) {
-          return filtersCount[key].close;
-        }
-          return filtersCount[key].unclose;
-        case 'middle':
-          if (estateCount > MIDDLE_PRICE && estateCount <= HIGH_PRICE) {
-            return filtersCount[key].same;
-          } else if (estateCount < MIDDLE_PRICE) {
-            return filtersCount[key].close;
-          }
-          return filtersCount[key].unclose;
-        case 'high':
-          if (estateCount > HIGH_PRICE) {
-            return filtersCount[key].same;
-          } else if (estateCount > MIDDLE_PRICE) {
-            return filtersCount[key].close;
-          }
-          return filtersCount[key].unclose;
-        default:
-          return 0;
-      }
+    'wifi': {
+      same: 50,
+      no: 0
     },
-    'rooms': function (key, estateCount, filterKey) {
-      switch (filterKey) {
-        case 1: if (parseInt(estateCount, 10) === parseInt(filterKey, 10)) {
-          return filtersCount[key].same;
-        } else if (parseInt(estateCount, 10) > parseInt(filterKey, 10)) {
-          return filtersCount[key].more;
-        }
-          return filtersCount[key].less;
-        case 2:
-          if (parseInt(estateCount, 10) === parseInt(filterKey, 10)) {
-            return filtersCount[key].same;
-          } else if (parseInt(estateCount, 10) > parseInt(filterKey, 10)) {
-            return filtersCount[key].more;
-          }
-          return filtersCount[key].less;
-        case 3:
-          if (parseInt(estateCount, 10) === parseInt(filterKey, 10)) {
-            return filtersCount[key].same;
-          } else if (parseInt(estateCount, 10) > (parseInt(filterKey, 10) - 2)) {
-            return filtersCount[key].more;
-          }
-          return filtersCount[key].less;
-        default:
-          // console.log('default!!');
-          return 0;
-      }
+    'dishwasher': {
+      same: 50,
+      no: 0
     },
-    // 'guests': function (key, estateKey, filterKey) {
-
-    // },
+    'parking': {
+      same: 50,
+      no: 0
+    },
+    'washer': {
+      same: 50,
+      no: 0
+    },
+    'elevator': {
+      same: 50,
+      no: 0
+    },
+    'conditioner': {
+      same: 50,
+      no: 0
+    },
   };
 
-  var doFilterEstate = function (estates, filter) {
-    // console.log(estates);
-    // console.log(filter);
-    var whatToReturn = window.util.getArraySequence(5);
-    // console.log(whatToReturn);
-    var estatesFiltersCost = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-    if (filter) {
-      try {
-        for (var key in filter) {
-          if (filter instanceof Object) {
-            estates.forEach(function (estate, index) {
-              // console.log(j + '  ' + index + '   ' + key + '  ' + filter[key] + '   ' + estate.offer[key] + '   ' + countDifferenceCost[key](estate.offer[key], key));
-              estatesFiltersCost[index] += countDifferenceCost[key](key, estate.offer[key], filter[key]);
-            });
-          }
-        }
-      } catch (err) {
-        // console.log('tryCatch  ' + err);
+  var SELECT_ID = {
+    'type': 0,
+    'price': 1,
+    'rooms': 2,
+    'guests': 3,
+    'wifi': 4,
+    'dishwasher': 5,
+    'parking': 6,
+    'washer': 7,
+    'elevator': 8,
+    'conditioner': 9
+  };
+
+  var sortRating = function (ratingArray) {
+    var copyRatingArray = ratingArray.slice(0);
+
+    var sortEstateIndexes = function (a, b) {
+      if (a[1] > b[1]) {
+        return -1;
       }
-      // console.log(estatesFiltersCost);
-    }
-    // console.log('here!' + estatesFiltersCost);
-    return whatToReturn;
-  };
-
-  var takefilters = function () {
-    var selectedFiltres = {};
-
-    for (var key in filtresCount) {
-      if (filtresCount[key] !== 'any') {
-        selectedFiltres[filtresToProperties[key]] = filtresCount[key]; // заменить на значения в массиве объектов недвижимости
+      if (b[1] > a[1]) {
+        return 1;
       }
-    }
-
-    return selectedFiltres;
-  };
-
-
-  var filtresToProperties = {
-    'housing-type': 'type',
-    'housing-price': 'price',
-    'housing-rooms': 'rooms',
-    'housing-guests': 'guests',
-    'filter-wifi': 'wifi',
-    'filter-dishwasher': 'dishwasher',
-    'filter-parking': 'parking',
-    'filter-washer': 'washer',
-    'filter-elevator': 'elevator',
-    'filter-conditioner': 'conditioner',
-  };
-
-  var filtresCount = { // rename
-    'housing-type': 'any',
-    'housing-price': 'any',
-    'housing-rooms': 'any',
-    'housing-guests': 'any',
-    'filter-wifi': 'any',
-    'filter-dishwasher': 'any',
-    'filter-parking': 'any',
-    'filter-washer': 'any',
-    'filter-elevator': 'any',
-    'filter-conditioner': 'any',
-  };
-
-  var activateFilters = function () {
-    /* var TYPE_ACTION = {
-      'select-one': 'change',
-      'checkbox':
-    }*/
-    var filtersForm = document.querySelector('.map__filters');
-    var elements = filtersForm.elements;
-    // var currentFiltres = [];
-
-    var filterChangeHandler = function (evt) {
-      if (evt.target.type === 'select-one') {
-        var selectedIndex = evt.target.options.selectedIndex;
-        filtresCount[evt.target.id] = evt.target.options[selectedIndex].value;
-      } else {
-        if (evt.target.checked) {
-          filtresCount[evt.target.id] = evt.target.value;
-        } else {
-          filtresCount[evt.target.id] = 'any';
-        }
-
-      }
-      var currentFiltres = takefilters();
-      var sortedEstates = doFilterEstate(window.init.serverEstateData, currentFiltres);
-      window.map.refreshMapPins(sortedEstates);
-      // console.log(currentFiltres);
-
-      /* if (massive.offer[filtresToProperties[key]]) {
-        // selectedFiltres[key] = massive[key];
-        console.log(massive.offer[filtresToProperties[key]]);
-      }*/
-    /* var estatesRating = [];
-    massive.forEach(function (item) {
-      for (var key in selectedFiltres) {
-        item.offer[]
-      }
-    });
-*/
+      return 0;
     };
 
+    return copyRatingArray.sort(sortEstateIndexes);
+  };
+
+  var makeEmptyRatingArray = function (length) {
+    var estatesFiltersCost = [];
+    for (var i = 0; i < length; i++) {
+      estatesFiltersCost.push([i, 0]);
+    }
+    return estatesFiltersCost;
+  };
+
+  var makeDefaultRatingArray = function (length) {
+    var estatesFiltersCost = [];
+    for (var i = 0; i < length; i++) {
+      estatesFiltersCost.push([i, length - i - 1]);
+    }
+    return estatesFiltersCost;
+  };
+
+  var selectorsCount = {
+    'type': 'any',
+    'price': 'any',
+    'rooms': 'any',
+    'guests': 'any'
+  };
+
+  var checkboxCount = {
+    'wifi': 'any',
+    'dishwasher': 'any',
+    'parking': 'any',
+    'washer': 'any',
+    'elevator': 'any',
+    'conditioner': 'any'
+  };
+
+  var getTypeRating = function (dataValue) {
+    var typeRatings = {};
+    TYPES_FILTERS_VALUE.forEach(function (value) {
+      if (value === dataValue) {
+        typeRatings[value] = filtersCountsCosts['type'].same; // !!!!!!!!!!!!!!
+      } else {
+        typeRatings[value] = filtersCountsCosts['type'].no;
+      }
+    });
+    return typeRatings;
+  };
+
+  var getPriceRating = function (dataPrice) {
+    var priceRatings = {};
+    var key = 'price';
+    PRICE_FILTERS_VALUE.forEach(function (value) {
+      switch (value) {
+        case 'low': if (dataPrice <= MIDDLE_PRICE) {
+          priceRatings[value] = filtersCountsCosts[key].same;
+        } else if (dataPrice < HIGH_PRICE) {
+          priceRatings[value] = filtersCountsCosts[key].close;
+        } else {
+          priceRatings[value] = filtersCountsCosts[key].unclose;
+        }
+          break;
+        case 'middle':
+          if (dataPrice > MIDDLE_PRICE && dataPrice <= HIGH_PRICE) {
+            priceRatings[value] = filtersCountsCosts[key].same;
+          } else if (dataPrice < MIDDLE_PRICE) {
+            priceRatings[value] = filtersCountsCosts[key].close;
+          } else {
+            priceRatings[value] = filtersCountsCosts[key].unclose;
+          }
+          break;
+        case 'high':
+          if (dataPrice > HIGH_PRICE) {
+            priceRatings[value] = filtersCountsCosts[key].same;
+          } else if (dataPrice > MIDDLE_PRICE) {
+            priceRatings[value] = filtersCountsCosts[key].close;
+          } else {
+            priceRatings[value] = filtersCountsCosts[key].unclose;
+          }
+          break;
+        default:
+          priceRatings[value] = 0;
+      }
+    });
+    return priceRatings;
+
+  };
+
+  var getRoomsRating = function (dataRoomsCount) {
+    var key = 'rooms';
+    var roomsRatings = {};
+    ROOMS_FILTERS_VALUE.forEach(function (value) {
+      if (parseInt(dataRoomsCount, 10) === parseInt(value, 10)) {
+        roomsRatings[value] = filtersCountsCosts[key].same;
+      } else if (Math.abs(parseInt(value, 10) - parseInt(dataRoomsCount, 10)) < NUMEROUS_FILTERS_RESISTANCE) {
+        roomsRatings[value] = filtersCountsCosts[key].close;
+      } else {
+        roomsRatings[value] = filtersCountsCosts[key].unclose;
+      }
+    });
+    return roomsRatings;
+  };
+
+  var getGuestRating = function (dataGuests) {
+    var guestRatings = [];
+    GUESTS_FILTERS_VALUE.forEach(function (value) {
+      if (parseInt(value, 10) === parseInt(dataGuests, 10)) {
+        guestRatings[value] = filtersCountsCosts['guests'].same;
+      } else if (Math.abs(parseInt(value, 10) - parseInt(dataGuests, 10)) < NUMEROUS_FILTERS_RESISTANCE) {
+        guestRatings[value] = filtersCountsCosts['guests'].close;
+      } else {
+        guestRatings[value] = filtersCountsCosts['guests'].unclose;
+      }
+    });
+    return guestRatings;
+  };
+
+  var getFeaturesRating = function (feature, isEstateFeature) {
+    var featureRatings = {};
+    if (isEstateFeature) {
+      featureRatings[feature] = filtersCountsCosts[feature].same;
+    } else {
+      featureRatings[feature] = filtersCountsCosts[feature].no;
+    }
+    featureRatings['any'] = 0;
+    return featureRatings;
+  };
+
+  var makeEmptyArray = function (length) {
+    var emptyArray = [];
+    for (var index = 0; index < length; index++) {
+      emptyArray[index] = 0;
+    }
+    return emptyArray;
+  };
+
+  var addBeginingCondition = function (arrayCondition) {
+    var tableConditions = window.util.getEmtyArray(arrayCondition.length, FILTERS_COUNT + 1);
+    tableConditions.forEach(function (estate, id) {
+      estate[FILTERS_COUNT] = arrayCondition[id][1];
+    });
+    return tableConditions;
+  };
+
+  var countRatings = function (objects) {
+    var finalRatingTable = window.util.getEmtyArray(objects.length, FILTERS_COUNT);
+    beginRatingConditions = makeDefaultRatingArray(objects.length);
+    filtersConditions = addBeginingCondition(beginRatingConditions);
+    zeroConditions = makeEmptyArray(objects.length); // перенести в util
+
+    for (var i = 0; i < objects.length; i++) {
+      var estateOffer = objects[i].offer;
+      finalRatingTable[i][0] = getTypeRating(estateOffer.type);
+      finalRatingTable[i][1] = getPriceRating(estateOffer.price);
+      finalRatingTable[i][2] = getRoomsRating(estateOffer.rooms);
+      finalRatingTable[i][3] = getGuestRating(estateOffer.guests);
+      var estateFeatures = estateOffer.features;
+      FEATURES_FILTERS_VALUE.forEach(function (value, index) {
+        var checkFeature = function (feature) {
+          if (feature === value) {
+            return true;
+          }
+          return false;
+        };
+        finalRatingTable[i][4 + index] = getFeaturesRating(value, estateFeatures.some(checkFeature));
+      });
+
+    }
+    return finalRatingTable;
+  };
+
+  var getCondition = function (selectValue, filterIndex) {
+    if (selectValue !== 'any') {
+      var currentCondition = estatesFiltresValues.map(function (estate) {
+        return estate[filterIndex][selectValue];
+      });
+    } else {
+      return zeroConditions;
+    }
+    return currentCondition;
+  };
+
+  var getRating = function (newCondition, id) {
+    filtersConditions.forEach(function (estate, index) {
+      estate[id] = newCondition[index];
+      estatesRating[index][1] = estate.reduce(function (sum, item) {
+        return sum + item;
+      });
+    });
+    return estatesRating;
+  };
+
+  var activateFilters = function (estates) {
+    estatesFiltresValues = countRatings(estates);
+
+    var filtersForm = document.querySelector('.map__filters');
+    var elements = filtersForm.elements;
+    estatesRating = makeEmptyRatingArray(estates.length);
+
+    var getSortedIndexes = function (arrayIndexCount) {
+      var resultArray = [];
+      for (var i = 0; i < arrayIndexCount.length; i++) {
+        resultArray.push(arrayIndexCount[i][0]);
+      }
+      return resultArray;
+    };
+
+
+    var filterChangeHandler = function (evt) {
+      var selectID;
+      var selectValue;
+      if (evt.target.type === 'select-one') {
+        var selectedIndex = evt.target.options.selectedIndex;
+        selectorsCount[evt.target.id] = evt.target.options[selectedIndex].value;
+        selectID = window.util.getSubString(evt.target.id, '-');
+        selectorsCount[selectID] = evt.target.options[selectedIndex].value; // ????????
+        selectValue = selectorsCount[selectID];
+      } else {
+        if (evt.target.checked) {
+          selectID = window.util.getSubString(evt.target.id, '-');
+          checkboxCount[selectID] = evt.target.value; //
+          selectValue = checkboxCount[selectID];
+        } else {
+          selectID = window.util.getSubString(evt.target.id, '-'); // DRY
+          checkboxCount[selectID] = 'any';
+          selectValue = checkboxCount[selectID];
+        }
+      }
+
+      var raitingCondition = getRating(getCondition(selectValue, SELECT_ID[selectID]), SELECT_ID[selectID]);
+
+      raitingCondition = sortRating(raitingCondition);
+
+      var resultRaitig = getSortedIndexes(raitingCondition);
+      window.map.refreshMapPins(resultRaitig);
+    };
 
     for (var i = 0; i < elements.length; i++) {
       var elementType = elements[i].type.toLowerCase();
       if (elementType === 'select-one' || elementType === 'checkbox') {
         var filter = elements[i];
         filter.addEventListener('change', filterChangeHandler);
-        // console.log(filtresCount[filter.id]);
       }
 
 
     }
-    // console.log(filtresCount);
   };
-  /* switch (elementType) {
-        case 'select-one':
-          var selectOptions = elements[i].options;
-          for (var j = 0; j < selectOptions.length; j++) {
-            if (selectOptions[j].defaultSelected) {
-              selectOptions.selectedIndex = j;
-              break;
-            }
-          }
-          break;
-          // case 'file':
-          //
-          //       break;
-          // case 'number':
-          //
-          //     break;
-        case 'checkbox':
-          if (elements[i].checked) {
-            elements[i].checked = false;
-          }
-          break;
-        default:
-          break;
-      }*/
-  /*
- author: {
-        avatar: AVATARS_PATH + (avatarsRandomSequenceIndex[numberEstateOblect] + 1) + '.png'},
-      offer: {
-        title: ESTATE_TITLES[estateTitlesIndex[numberEstateOblect]],
-        address: [locationX, locationY],
-        price: window.util.getRandomMinMax(MIN_PRICE_UNIT, MAX_PRICE_UNIT),
-        type: window.util.chooseRandomArrayItem(ESTATE_TYPES),
-        rooms: countRooms,
-        guests: window.util.getRandomMinMax(1, (countRooms * MAX_GUESTS_IN_ROOMS)),
-        checkin: window.util.chooseRandomArrayItem(CHECK_IN_OUT_VARIANTS),
-        checkout: window.util.chooseRandomArrayItem(CHECK_IN_OUT_VARIANTS),
-        features: window.util.cropArray(FEATURES_VARIANTS, window.util.getRandomMinMax(0, FEATURES_VARIANTS.length)),
-        description: '',
-        photos: getArrayPhotos(ESTATE_PHOTOS)
-      },
 
-      location: {
-        x: locationX,
-        y: locationY
-      }
-
-*/
-
-  /* for (var key in filtresCount) {
-
-    }*/
-  // return filtresCount;
-  // id select             offer:
-  // housing-type          type: window.util.chooseRandomArrayItem(ESTATE_TYPES), ['palace', 'flat', 'house', 'bungalo']
-  // housing-price         price: window.util.getRandomMinMax(MIN_PRICE_UNIT, MAX_PRICE_UNIT)
-  // housing-rooms         rooms: countRooms,
-  // housing-guests        guests: window.util.getRandomMinMax(1, (countRooms * MAX_GUESTS_IN_ROOMS)),
-
-  // id checkbox           features: window.util.cropArray(FEATURES_VARIANTS, window.util.getRandomMinMax(0, FEATURES_VARIANTS.length)),
-  // filter-wifi
-  // filter-dishwasher
-  // filter-parking
-  // filter-washer
-  // filter-elevator
-  // filter-conditioner    'wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'
-
-  // changefilters: changefilters
   window.filtersForm = {
-    takefilters: takefilters,
     activateFilters: activateFilters,
-    filtresCount: filtresCount,
-    checkRefreshMap: checkRefreshMap,
-    doFilterEstate: doFilterEstate
   };
 })();
 
