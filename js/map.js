@@ -28,16 +28,18 @@
     window.map.mainPinPoint.style.top = MAIN_PIN_DEFAULT_TOP + 'px';
   };
 
-  var pushPinsToMap = function (massiveObjects) {
+  var pushPinsToMap = function (esatates) {
+    var processedData = esatates;
+    if (esatates.length > SHOW_PINS_COUNT) {
+      processedData = esatates.slice(0, SHOW_PINS_COUNT);
+    }
     var fragmentPin = document.createDocumentFragment();
     var insertPlacePin = document.querySelector('.map__pins');
-    massiveObjects.forEach(function (estateObject, i) {
+    processedData.forEach(function (estateObject, i) {
       fragmentPin.appendChild(window.pin.getNewPin(estateObject, i));
-      // window.filtersForm.checkRefreshMap.push(i); // лишнее!!!!!
     });
     insertPlacePin.appendChild(fragmentPin);
     addEventsPin();
-    refreshMapPins(window.util.getArraySequence(SHOW_PINS_COUNT));
   };
 
   var changeActivePin = function (pin) {
@@ -74,21 +76,11 @@
         pin.remove();
       });
     }
-    mainPinPoint.removeEventListener('mouseup', window.init.initMain);
   };
 
-  var refreshMapPins = function (estateIndexes) {
-    var mapPins = document.querySelectorAll('.map__pin:not(.map__pin--main)');
-
-    if (mapPins) {
-      mapPins.forEach(function (pin) {
-        window.util.hideElement(pin);
-      });
-    }
-    for (var i = 0; i < estateIndexes.length; i++) {
-      var pin = document.getElementById('pin' + estateIndexes[i]);
-      window.util.showElement(pin);
-    }
+  var rewriteMapPins = function (filtredEstates) {
+    removeMapPins();
+    pushPinsToMap(filtredEstates);
   };
 
   window.map = {
@@ -101,7 +93,7 @@
     removeMapPins: removeMapPins,
     addEventsPin: addEventsPin,
     changeActivePin: changeActivePin,
-    refreshMapPins: refreshMapPins
+    rewriteMapPins: rewriteMapPins
   };
 })();
 

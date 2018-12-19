@@ -97,7 +97,7 @@
     };
 
     estateObjects[index].offer.photos.forEach(constructPhotos);
-    estatePhotosDiv.appendChild(photosFragment); // а что если картинки не заргужены?? как не отображать?
+    estatePhotosDiv.appendChild(photosFragment);
 
   };
 

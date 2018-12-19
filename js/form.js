@@ -26,12 +26,6 @@
               }
             }
             break;
-            // case 'file':
-            //
-            //       break;
-            // case 'number':
-            //
-            //     break;
           case 'checkbox':
             if (elements[i].checked) {
               elements[i].checked = false;

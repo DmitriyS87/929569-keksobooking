@@ -9,7 +9,7 @@
   var firstInit = true;
 
   var onLoad = function (data) {
-    data.forEach(function (estateObject) {
+    data.forEach(function (estateObject) { // зачем??
       serverEstateData.push(estateObject);
     });
     checkLoadedData(serverEstateData);
@@ -19,9 +19,7 @@
       firstInit = false;
       window.filtersForm.activateFilters(serverEstateData);
     }
-    window.map.pushPinsToMap(serverEstateData); // передать данные через модуль фильтра??? ГОВ.фильтр.колбэк??
-    // var filtredEstates = window.filtersForm.doFilterEstate(serverEstateData);
-  //  window.map.refreshMapPins(filtredEstates);
+    window.map.pushPinsToMap(serverEstateData);
   };
 
   var checkLoadedData = function (estateData) {
