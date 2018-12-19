@@ -6,7 +6,15 @@
     return str.substring(str.indexOf(devider)).slice(1);
   };
 
-  var getEmtyArray = function (sizeI, sizeJ) {
+  var getEmtyArray = function (length) {
+    var array = [];
+    for (var j = 0; j <= length; j++) {
+      array[j] = 0;
+    }
+    return array;
+  };
+
+  var getEmtyMatrixArray = function (sizeI, sizeJ) {
     var arrayIJ = [];
     for (var i = 0; i < sizeI; i++) {
       arrayIJ[i] = [];
@@ -89,6 +97,7 @@
     cropArray: cropArray,
     getArrayRandomSequence: getArrayRandomSequence,
     getEmtyArray: getEmtyArray,
+    getEmtyMatrixArray: getEmtyMatrixArray,
     getSubString: getSubString
   };
 

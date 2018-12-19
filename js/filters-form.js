@@ -12,6 +12,9 @@
   var FEATURES_FILTERS_VALUE = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
   var NUMEROUS_FILTERS_RESISTANCE = 1;
 
+  var strongRatingCount = 0;
+  var formFiltersCondition = [];
+
   var estatesRating = [];
   var estatesFiltresValues = [];
   var beginRatingConditions = [];
@@ -92,6 +95,18 @@
     };
 
     return copyRatingArray.sort(sortEstateIndexes);
+  };
+
+  var cutRaitingCondition = function (ratingArray) {
+    var cutArray = [];
+    for (var i = 0; i < ratingArray.length; i++) {
+      if (ratingArray[i][1] >= strongRatingCount) {
+        cutArray.push(ratingArray[i]);
+      } else {
+        break;
+      }
+    }
+    return cutArray;
   };
 
   var makeEmptyRatingArray = function (length) {
@@ -226,7 +241,7 @@
   };
 
   var addBeginingCondition = function (arrayCondition) {
-    var tableConditions = window.util.getEmtyArray(arrayCondition.length, FILTERS_COUNT + 1);
+    var tableConditions = window.util.getEmtyMatrixArray(arrayCondition.length, FILTERS_COUNT + 1);
     tableConditions.forEach(function (estate, id) {
       estate[FILTERS_COUNT] = arrayCondition[id][1];
     });
@@ -234,7 +249,7 @@
   };
 
   var countRatings = function (objects) {
-    var finalRatingTable = window.util.getEmtyArray(objects.length, FILTERS_COUNT);
+    var finalRatingTable = window.util.getEmtyMatrixArray(objects.length, FILTERS_COUNT);
     beginRatingConditions = makeDefaultRatingArray(objects.length);
     filtersConditions = addBeginingCondition(beginRatingConditions);
     zeroConditions = makeEmptyArray(objects.length); // перенести в util
@@ -260,12 +275,20 @@
     return finalRatingTable;
   };
 
-  var getCondition = function (selectValue, filterIndex) {
+  var getCondition = function (selectValue, filterName, filterIndex) {
     if (selectValue !== 'any') {
+      if (formFiltersCondition[filterIndex] === 0) {
+        strongRatingCount = strongRatingCount + filtersCountsCosts[filterName].same;
+        formFiltersCondition[filterIndex] = 1;
+      }
       var currentCondition = estatesFiltresValues.map(function (estate) {
         return estate[filterIndex][selectValue];
       });
     } else {
+      if (formFiltersCondition[filterIndex] === 1) {
+        strongRatingCount = strongRatingCount - filtersCountsCosts[filterName].same;
+      }
+      formFiltersCondition[filterIndex] = 0;
       return zeroConditions;
     }
     return currentCondition;
@@ -283,12 +306,13 @@
 
   var activateFilters = function (estates) {
     estatesFiltresValues = countRatings(estates);
+    formFiltersCondition = window.util.getEmtyArray(FILTERS_COUNT);
 
     var filtersForm = document.querySelector('.map__filters');
     var elements = filtersForm.elements;
     estatesRating = makeEmptyRatingArray(estates.length);
 
-    var getSortedIndexes = function (arrayIndexCount) {
+    var getEstateIndexes = function (arrayIndexCount) {
       var resultArray = [];
       for (var i = 0; i < arrayIndexCount.length; i++) {
         resultArray.push(arrayIndexCount[i][0]);
@@ -298,31 +322,34 @@
 
 
     var filterChangeHandler = function (evt) {
-      var selectID;
+      var filterName;
       var selectValue;
       if (evt.target.type === 'select-one') {
         var selectedIndex = evt.target.options.selectedIndex;
         selectorsCount[evt.target.id] = evt.target.options[selectedIndex].value;
-        selectID = window.util.getSubString(evt.target.id, '-');
-        selectorsCount[selectID] = evt.target.options[selectedIndex].value; // ????????
-        selectValue = selectorsCount[selectID];
+        filterName = window.util.getSubString(evt.target.id, '-');
+        selectorsCount[filterName] = evt.target.options[selectedIndex].value; // ????????
+        selectValue = selectorsCount[filterName];
       } else {
         if (evt.target.checked) {
-          selectID = window.util.getSubString(evt.target.id, '-');
-          checkboxCount[selectID] = evt.target.value; //
-          selectValue = checkboxCount[selectID];
+          filterName = window.util.getSubString(evt.target.id, '-');
+          checkboxCount[filterName] = evt.target.value; //
+          selectValue = checkboxCount[filterName];
         } else {
-          selectID = window.util.getSubString(evt.target.id, '-'); // DRY
-          checkboxCount[selectID] = 'any';
-          selectValue = checkboxCount[selectID];
+          filterName = window.util.getSubString(evt.target.id, '-'); // DRY
+          checkboxCount[filterName] = 'any';
+          selectValue = checkboxCount[filterName];
         }
       }
 
-      var raitingCondition = getRating(getCondition(selectValue, SELECT_ID[selectID]), SELECT_ID[selectID]);
+      var raitingCondition = getRating(getCondition(selectValue, filterName, SELECT_ID[filterName]), SELECT_ID[filterName]);
 
-      raitingCondition = sortRating(raitingCondition);
+      var sortedRaitingCondition = sortRating(raitingCondition);
 
-      var resultRaitig = getSortedIndexes(raitingCondition);
+      var cuttedRaitingCondition = cutRaitingCondition(sortedRaitingCondition);
+
+      var resultRaitig = getEstateIndexes(cuttedRaitingCondition);
+
       window.map.refreshMapPins(resultRaitig);
     };
 

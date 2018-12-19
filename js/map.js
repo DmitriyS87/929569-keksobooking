@@ -37,6 +37,7 @@
     });
     insertPlacePin.appendChild(fragmentPin);
     addEventsPin();
+    refreshMapPins(window.util.getArraySequence(SHOW_PINS_COUNT));
   };
 
   var changeActivePin = function (pin) {
@@ -78,18 +79,16 @@
 
   var refreshMapPins = function (estateIndexes) {
     var mapPins = document.querySelectorAll('.map__pin:not(.map__pin--main)');
-    // console.log(mapPins);
+
     if (mapPins) {
       mapPins.forEach(function (pin) {
-        // console.log(pin);
         window.util.hideElement(pin);
       });
     }
-    for (var i = 0; i < SHOW_PINS_COUNT; i++) {
+    for (var i = 0; i < estateIndexes.length; i++) {
       var pin = document.getElementById('pin' + estateIndexes[i]);
       window.util.showElement(pin);
     }
-    // window.init.serverEstateData;
   };
 
   window.map = {
