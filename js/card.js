@@ -13,23 +13,32 @@
   var featuresElements = [];
 
   var addHiddenCard = function () {
+
     var fragmentCard = document.createDocumentFragment();
     fragmentCard.appendChild(templateCard);
+
     var insertPlaceCard = document.querySelector('.map');
     insertPlaceCard.insertBefore(fragmentCard, insertPlaceCard.lastChild);
+
     popupCard = document.querySelector('.map__card');
     cross = popupCard.querySelector('.popup__close');
     cross.addEventListener('click', crossClickHandler);
+
     templateCardImg = popupCard.querySelector('.popup__photos img');
+
     window.util.hideElement(popupCard);
     showedCard = false;
+
     saveFeatures();
+
     var cardPhotos = document.querySelector('.popup__photos');
+
     var imageClickHandler = function (evt) {
       if (evt.target.tagName === 'IMG') {
         window.photoViewer.showFullScreen(evt.target);
       }
     };
+
     cardPhotos.addEventListener('click', imageClickHandler);
 
 
