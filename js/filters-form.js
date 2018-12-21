@@ -20,10 +20,7 @@
     if (selectorsCount[key] === 'any') {
       return true;
     } else {
-      if (estate.offer.type === selectorsCount[key]) {
-        return true;
-      }
-      return false;
+      return estate.offer.type === selectorsCount[key];
     }
   };
 
@@ -34,20 +31,12 @@
     } else {
       var dataPrice = estate.offer.price;
       switch (selectorsCount[key]) {
-        case 'low': if (dataPrice <= MIDDLE_PRICE) {
-          return true;
-        }
-          return false;
+        case 'low':
+          return dataPrice <= MIDDLE_PRICE;
         case 'middle':
-          if (dataPrice > MIDDLE_PRICE && dataPrice <= HIGH_PRICE) {
-            return true;
-          }
-          return false;
+          return dataPrice > MIDDLE_PRICE && dataPrice <= HIGH_PRICE;
         case 'high':
-          if (dataPrice > HIGH_PRICE) {
-            return true;
-          }
-          return false;
+          return dataPrice > HIGH_PRICE;
       }
       return false;
     }
@@ -59,10 +48,7 @@
     if (selectorsCount[key] === 'any') {
       return true;
     } else {
-      if (parseInt(estate.offer.rooms, 10) === parseInt(selectorsCount[key], 10)) {
-        return true;
-      }
-      return false;
+      return parseInt(estate.offer.rooms, 10) === parseInt(selectorsCount[key], 10);
     }
   };
 
@@ -71,10 +57,7 @@
     if (selectorsCount[key] === 'any') {
       return true;
     } else {
-      if (parseInt(estate.offer.guests, 10) === parseInt(selectorsCount[key], 10)) {
-        return true;
-      }
-      return false;
+      return parseInt(estate.offer.guests, 10) === parseInt(selectorsCount[key], 10);
     }
   };
 
@@ -85,9 +68,7 @@
         var featuresCondition = estate.offer.features.some(function (item) {
           return item === checkboxesChecked[i];
         });
-        if (!featuresCondition) {
-          return false;
-        }
+        return featuresCondition;
       }
     }
     return true;
