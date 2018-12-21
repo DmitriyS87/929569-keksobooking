@@ -1,6 +1,8 @@
 'use strict';
 
 (function () {
+  var debounceTime = 500;
+  var lastTimeout;
   var MIDDLE_PRICE = 10000;
   var HIGH_PRICE = 50000;
 
@@ -86,7 +88,16 @@
     for (var i = 0; i < checkBoxes.length; i++) {
       checkboxesChecked.push(window.util.getSubString(checkBoxes[i].id, '-'));
     }
-    applyFilter(incomingEstates);
+    debounceAplyFilter();
+  };
+
+  var debounceAplyFilter = function () {
+    if (lastTimeout) {
+      window.clearTimeout(lastTimeout);
+    }
+    lastTimeout = window.setTimeout(function () {
+      applyFilter(incomingEstates);
+    }, debounceTime);
   };
 
   var activateFilters = function (estates) {
@@ -94,12 +105,13 @@
     var filtersForm = document.querySelector('.map__filters');
     var elements = filtersForm.elements;
 
+
     var selectorChangeHandler = function (evt) {
       var filterName;
       var selectedIndex = evt.target.options.selectedIndex;
       filterName = window.util.getSubString(evt.target.id, '-');
       selectorsCount[filterName] = evt.target.options[selectedIndex].value;
-      applyFilter(incomingEstates);
+      debounceAplyFilter();
     };
 
 
