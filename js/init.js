@@ -2,7 +2,7 @@
 
 (function () {
 
-  var ESC_CODE = 27;
+
   var serverEstateData = [];
 
   var onLoad = function (data) {
@@ -58,7 +58,7 @@
     }
 
     var documentKeyPressHandler = function (evt) {
-      if (evt.keyCode === ESC_CODE) {
+      if (evt.keyCode === window.util.ESC_CODE) {
         sendMessage.remove();
         document.removeEventListener('keypress', documentKeyPressHandler);
       }

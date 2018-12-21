@@ -50,10 +50,18 @@
 
   var changeActivePin = function (pin) {
     var activePin = document.querySelector('.map__pin--active');
+    console.log('activePin');
+    console.log(activePin);
+    console.log('pin');
+    console.log(pin);
     if (activePin) {
-      activePin.classList.remove('.map__pin--active');
+      console.log('remove');
+      activePin.classList.remove('map__pin--active');
     }
-    pin.classList.add('.map__pin--active');
+    if (activePin !== pin) {
+      console.log('add');
+      pin.classList.add('map__pin--active');
+    }
   };
 
   var removeMapPins = function () {

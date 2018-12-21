@@ -2,6 +2,8 @@
 
 (function () {
 
+  var ESC_CODE = 27;
+
   var getSubString = function (str, devider) {
     return str.substring(str.indexOf(devider)).slice(1);
   };
@@ -24,6 +26,7 @@
     showElement: showElement,
     removeChildren: removeChildren,
     getSubString: getSubString,
+    ESC_CODE: ESC_CODE
   };
 
 })();
