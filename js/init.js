@@ -1,50 +1,49 @@
 'use strict';
 
-// модуль отвечает за общее состояние страницы
-
 (function () {
 
-  var ESC_CODE = 27;
+
   var serverEstateData = [];
-  var firstInit = true;
 
   var onLoad = function (data) {
-    data.forEach(function (estateObject) {
-      serverEstateData.push(estateObject);
-    });
+    serverEstateData = data.slice(0);
+    checkLoadedData(serverEstateData);
     window.form.activateForm();
-    if (firstInit) {
-      window.card.addHiddenCard();
-      firstInit = false;
-    }
+    window.filtersForm.activateFilters(serverEstateData);
     window.map.pushPinsToMap(serverEstateData);
-    window.map.addEventsPin();
+  };
+
+  var checkLoadedData = function (estateData) {
+    estateData.forEach(function (estateObject, index) {
+      if (!estateObject.offer.title && !estateObject.offer.price && !estateObject.location.x && !estateObject.location.y) {
+        estateData = estateData.splice(index, 1);
+      }
+    });
   };
 
   var onError = function (errorMessage) {
     viewMessage('#error', '.error', errorMessage);
   };
 
-  window.form.disableForm();
-  window.form.setDefaultAdress();
-
-
-  var initMain = function () {
-    window.backend.load(onLoad, onError);
+  var makeListenerToLoad = function () {
+    var documentMouseUpHandler = function () {
+      window.backend.load(onLoad, onError);
+      document.querySelector('.map__pin--main').removeEventListener('mouseup', documentMouseUpHandler);
+    };
+    document.querySelector('.map__pin--main').addEventListener('mouseup', documentMouseUpHandler);
   };
+
+  window.form.disableForm();
+  makeListenerToLoad();
 
 
   var setDefaultPage = function () {
     window.map.removeMapPins();
     window.map.setMainPinDefault();
-    window.form.setDefaultAdress();
     window.form.disableForm();
-    window.form.formStatus = false;
-    if (window.card.showedCard) {
-      window.util.hideElement(document.querySelector('.map__card'));
-      window.card.showedCard = false;
-    }
-
+    window.card.removeCard();
+    window.filtersForm.resetFilters();
+    makeListenerToLoad();
   };
 
   var viewMessage = function (templateClass, messageClass, text) {
@@ -59,7 +58,7 @@
     }
 
     var documentKeyPressHandler = function (evt) {
-      if (evt.keyCode === ESC_CODE) {
+      if (evt.keyCode === window.util.ESC_CODE) {
         sendMessage.remove();
         document.removeEventListener('keypress', documentKeyPressHandler);
       }
@@ -73,11 +72,8 @@
     });
   };
 
-
   window.init = {
-    initMain: initMain,
     setDefaultPage: setDefaultPage,
     viewMessage: viewMessage,
-    serverEstateData: serverEstateData
   };
 })();

@@ -51,9 +51,8 @@
         var moveY = evtMove.clientY - downCords.downY;
         if (Math.abs(moveX) < MOVE_SENSIVITY && Math.abs(moveY) < MOVE_SENSIVITY) {
           return;
-        } else {
-          isDragged = true;
         }
+        isDragged = true;
 
         mainPinPoint.style.zIndex = 9999;
         mainPinPoint.style.position = 'absolute';
@@ -87,16 +86,8 @@
 
 
     var mainPinMouseupHandler = function () {
-      if (isDragged) {
-        if (!window.form.formStatus) {
-          window.init.initMain();
-        }
-      }
-
       document.removeEventListener('mousemove', mainPinMousemoveHandler);
       document.removeEventListener('mouseup', mainPinMouseupHandler);
-
-
     };
 
     document.addEventListener('mouseup', mainPinMouseupHandler);
