@@ -38,10 +38,7 @@
       if (nodeFeatures[i].tagName === 'LI') {
         var feature = (window.util.getSubString(nodeFeatures[i].getAttribute('class'), '-').slice(1));
         if (estate.offer.features.some(function (item) {
-          if (feature === item) {
-            return true;
-          }
-          return false;
+          return feature === item;
         })) {
           fragmentLU.appendChild(nodeFeatures[i].cloneNode(true));
           fragmentLU.appendChild(nodeFeatures[i - 1].cloneNode(true));
@@ -75,7 +72,7 @@
 
   var createCard = function (estate, pin) {
 
-    var crossClickHandler = function () { //
+    var crossClickHandler = function () {
       removeCard();
       window.map.changeActivePin(pin);
       showedCard = false;
@@ -86,7 +83,7 @@
     var insertPlaceCard = elementsMapSection[elementsMapSection.length - 2];
     var fragmentCard = document.createDocumentFragment();
     fragmentCard.appendChild(templateCard.content.cloneNode(true));
-    insertPlaceCard.appendChild(fragmentCard); // клон шаблона отрисовали на страницу
+    insertPlaceCard.appendChild(fragmentCard);
 
     popupCard = document.querySelector('.map__card');
 

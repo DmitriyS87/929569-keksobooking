@@ -19,9 +19,8 @@
     var key = 'type';
     if (selectorsCount[key] === 'any') {
       return true;
-    } else {
-      return estate.offer.type === selectorsCount[key];
     }
+    return estate.offer.type === selectorsCount[key];
   };
 
   var checkPrice = function (estate) {
@@ -47,29 +46,27 @@
     var key = 'rooms';
     if (selectorsCount[key] === 'any') {
       return true;
-    } else {
-      return parseInt(estate.offer.rooms, 10) === parseInt(selectorsCount[key], 10);
     }
+    return parseInt(estate.offer.rooms, 10) === parseInt(selectorsCount[key], 10);
+
   };
 
   var checkGuest = function (estate) {
     var key = 'guests';
     if (selectorsCount[key] === 'any') {
       return true;
-    } else {
-      return parseInt(estate.offer.guests, 10) === parseInt(selectorsCount[key], 10);
     }
+    return parseInt(estate.offer.guests, 10) === parseInt(selectorsCount[key], 10);
+
   };
 
   var checkFeatures = function (estate) {
-    if (checkboxesChecked.length > 0) {
-      for (var i = 0; i < checkboxesChecked.length; i++) {
+    for (var i = 0; i < checkboxesChecked.length; i++) {
 
-        var featuresCondition = estate.offer.features.some(function (item) {
-          return item === checkboxesChecked[i];
-        });
-        return featuresCondition;
-      }
+      var featuresCondition = estate.offer.features.some(function (item) {
+        return item === checkboxesChecked[i];
+      });
+      return featuresCondition;
     }
     return true;
   };
