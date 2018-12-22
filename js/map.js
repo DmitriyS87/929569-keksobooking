@@ -39,7 +39,7 @@
     });
     insertPlacePin.appendChild(fragmentPin);
 
-    document.querySelectorAll('.map__pin:not(.map__pin--main)').forEach(function (pin) {
+    [].forEach.call(document.querySelectorAll('.map__pin:not(.map__pin--main)'), function (pin) {
       pin.addEventListener('click', function () {
         window.card.removeCard();
         changeActivePin(pin);
@@ -60,10 +60,9 @@
 
   var removeMapPins = function () {
     var mapPins = document.querySelectorAll('.map__pin:not(.map__pin--main)');
-    mapPins.forEach(function (pin) {
+    [].forEach.call(mapPins, function (pin) {
       pin.remove();
     });
-
   };
 
   var rewriteMapPins = function (filtredEstates) {

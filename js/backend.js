@@ -89,7 +89,6 @@
     makeServerRequest(onLoad, onError, 'POST', SAVE_URL, data);
   };
 
-
   window.backend = {
     load: load,
     save: save

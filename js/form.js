@@ -26,12 +26,11 @@
     formFilters.classList.add('ad-form--disabled');
     setElementDisabled(formFilters);
     var elementsFieldset = document.querySelectorAll('.ad-form__element');
-    elementsFieldset.forEach(function (element) {
+    [].forEach.call(elementsFieldset, function (element) {
       setElementDisabled(element);
     });
     document.querySelector(inputFormCSS).classList.add('ad-form--disabled');
     document.querySelector('.map').classList.add('map--faded');
-
     document.querySelector(addressCSS).value = [window.map.sizeMainPin.defaultX, window.map.sizeMainPin.defaultY];
 
   };
@@ -68,10 +67,9 @@
     setElementEnabled(formFilters);
     document.querySelector('.map').classList.remove('map--faded');
     var elementsFieldset = document.querySelectorAll('.ad-form__element');
-    elementsFieldset.forEach(function (element) {
+    [].forEach.call(elementsFieldset, function (element) {
       setElementEnabled(element);
     });
-
 
     var synchronizeCheckOut = function () {
       checkOutTimeSelect.selectedIndex = checkInTimeSelect.selectedIndex;
@@ -172,7 +170,6 @@
 
   var onError = function (errorMessage) {
     window.init.viewMessage('#error', '.error', errorMessage);
-    // добавить функционал кнопке - попробывать еще раз?
   };
 
 
