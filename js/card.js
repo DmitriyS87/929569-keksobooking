@@ -13,7 +13,16 @@
   var removeCard = function () {
     if (showedCard) {
       document.querySelector('.map__card').remove();
-      document.removeEventListener('keypress', documentKeyPressHandler);
+      document.removeEventListener('keydown', documentKeyPressHandler);
+    }
+  };
+
+  var documentKeyPressHandler = function (evt) {
+    if (evt.keyCode === window.util.ESC_CODE) {
+      removeCard();
+      window.map.changeActivePin(pin);
+      showedCard = false;
+      document.removeEventListener('keydown', documentKeyPressHandler);
     }
   };
 
@@ -38,19 +47,12 @@
     showedCard = false;
   };
 
-  var documentKeyPressHandler = function (evt) {
-    if (evt.keyCode === window.util.ESC_CODE) {
-      removeCard();
-      window.map.changeActivePin(pin);
-      showedCard = false;
-      document.removeEventListener('keypress', documentKeyPressHandler);
-    }
-  };
-
   var putFeaturesToCard = function (estate, featuresNode) {
     var fragmentLU = document.createDocumentFragment();
     var cloneFeature = featuresNode.cloneNode(true);
     var nodeFeatures = cloneFeature.childNodes;
+
+    var estateFeaturesCount = 0;
     for (var i = 1; i < nodeFeatures.length; i++) {
       if (nodeFeatures[i].tagName === 'LI') {
         var feature = (window.util.getSubString(nodeFeatures[i].getAttribute('class'), '-').slice(1));
@@ -59,9 +61,15 @@
         })) {
           fragmentLU.appendChild(nodeFeatures[i].cloneNode(true));
           fragmentLU.appendChild(nodeFeatures[i - 1].cloneNode(true));
+          estateFeaturesCount++;
+          if (estateFeaturesCount === estate.offer.features.length) {
+            break;
+          }
         }
       }
     }
+
+
     window.util.removeChildren(document.querySelector('.popup__features'));
     document.querySelector('.popup__features').appendChild(fragmentLU);
   };
@@ -99,8 +107,11 @@
     popupCard = document.querySelector('.map__card');
 
     cross = popupCard.querySelector('.popup__close');
+
+
     cross.addEventListener('click', crossClickHandler);
-    document.addEventListener('keypress', documentKeyPressHandler);
+
+    document.addEventListener('keydown', documentKeyPressHandler);
 
     templateCardImg = popupCard.querySelector('.popup__photos img');
 

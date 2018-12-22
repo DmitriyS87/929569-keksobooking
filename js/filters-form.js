@@ -85,9 +85,9 @@
   var checkboxChangeHandler = function () {
     checkboxesChecked = [];
     var checkBoxes = document.querySelectorAll('.map__checkbox:checked');
-    for (var i = 0; i < checkBoxes.length; i++) {
-      checkboxesChecked.push(window.util.getSubString(checkBoxes[i].id, '-'));
-    }
+    [].forEach.call(checkBoxes, function (checkBox) {
+      checkboxesChecked.push(window.util.getSubString(checkBox.id, '-'));
+    });
     debounceAplyFilter();
   };
 
@@ -131,9 +131,9 @@
   var resetFilters = function () {
     document.querySelector('.map__filters').reset();
     var checkBoxes = document.querySelectorAll('.map__checkbox:checked');
-    for (var i = 0; i < checkBoxes.length; i++) {
-      checkBoxes.removeEventListener('change', checkboxChangeHandler);
-    }
+    [].forEach.call(checkBoxes, function (checkBox) {
+      checkBox.removeEventListener('change', checkboxChangeHandler);
+    });
   };
 
   window.filtersForm = {

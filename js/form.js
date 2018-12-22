@@ -26,12 +26,11 @@
     formFilters.classList.add('ad-form--disabled');
     setElementDisabled(formFilters);
     var elementsFieldset = document.querySelectorAll('.ad-form__element');
-    elementsFieldset.forEach(function (element) {
+    [].forEach.call(elementsFieldset, function (element) {
       setElementDisabled(element);
     });
     document.querySelector(inputFormCSS).classList.add('ad-form--disabled');
     document.querySelector('.map').classList.add('map--faded');
-
     document.querySelector(addressCSS).value = [window.map.sizeMainPin.defaultX, window.map.sizeMainPin.defaultY];
 
   };
@@ -68,10 +67,9 @@
     setElementEnabled(formFilters);
     document.querySelector('.map').classList.remove('map--faded');
     var elementsFieldset = document.querySelectorAll('.ad-form__element');
-    elementsFieldset.forEach(function (element) {
+    [].forEach.call(elementsFieldset, function (element) {
       setElementEnabled(element);
     });
-
 
     var synchronizeCheckOut = function () {
       checkOutTimeSelect.selectedIndex = checkInTimeSelect.selectedIndex;
@@ -90,6 +88,15 @@
     var checkOutTimeSelect = document.querySelector('#timeout');
     checkOutTimeSelect.addEventListener('change', synchronizeCheckIn);
 
+    var checkVailidCapacity = function () {
+      var validityMessage = 'Для данного количества комнат требуется указать иное количество гостей';
+
+      if (capacity[capacity.selectedIndex].disabled) {
+        capacity.setCustomValidity(validityMessage);
+      } else {
+        capacity.setCustomValidity('');
+      }
+    };
 
     var synchronizeCapacity = function () {
 
@@ -115,6 +122,8 @@
     roomsSelect.addEventListener('change', synchronizeCapacity);
     capacity.addEventListener('change', capacityClickHandler);
 
+    synchronizeCapacity();
+
     var resetFormData = function (evt) {
       evt.preventDefault();
       resetButton.removeEventListener('reset', resetFormData);
@@ -132,16 +141,6 @@
     dataForm.classList.remove('ad-form--disabled');
 
     dataForm.addEventListener('submit', submitData);
-
-    var checkVailidCapacity = function () {
-      var validityMessage = 'Для данного количества комнат требуется указать иное количество гостей';
-
-      if (capacity[capacity.selectedIndex].disabled) {
-        capacity.setCustomValidity(validityMessage);
-      } else {
-        capacity.setCustomValidity('');
-      }
-    };
 
     var resetButton = document.querySelector('.ad-form__reset');
 
@@ -171,7 +170,6 @@
 
   var onError = function (errorMessage) {
     window.init.viewMessage('#error', '.error', errorMessage);
-    // добавить функционал кнопке - попробывать еще раз?
   };
 
 
