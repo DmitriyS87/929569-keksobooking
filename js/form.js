@@ -90,6 +90,15 @@
     var checkOutTimeSelect = document.querySelector('#timeout');
     checkOutTimeSelect.addEventListener('change', synchronizeCheckIn);
 
+    var checkVailidCapacity = function () {
+      var validityMessage = 'Для данного количества комнат требуется указать иное количество гостей';
+
+      if (capacity[capacity.selectedIndex].disabled) {
+        capacity.setCustomValidity(validityMessage);
+      } else {
+        capacity.setCustomValidity('');
+      }
+    };
 
     var synchronizeCapacity = function () {
 
@@ -115,6 +124,8 @@
     roomsSelect.addEventListener('change', synchronizeCapacity);
     capacity.addEventListener('change', capacityClickHandler);
 
+    synchronizeCapacity();
+
     var resetFormData = function (evt) {
       evt.preventDefault();
       resetButton.removeEventListener('reset', resetFormData);
@@ -132,16 +143,6 @@
     dataForm.classList.remove('ad-form--disabled');
 
     dataForm.addEventListener('submit', submitData);
-
-    var checkVailidCapacity = function () {
-      var validityMessage = 'Для данного количества комнат требуется указать иное количество гостей';
-
-      if (capacity[capacity.selectedIndex].disabled) {
-        capacity.setCustomValidity(validityMessage);
-      } else {
-        capacity.setCustomValidity('');
-      }
-    };
 
     var resetButton = document.querySelector('.ad-form__reset');
 

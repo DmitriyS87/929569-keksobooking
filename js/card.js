@@ -13,7 +13,16 @@
   var removeCard = function () {
     if (showedCard) {
       document.querySelector('.map__card').remove();
-      document.removeEventListener('keypress', documentKeyPressHandler);
+      document.removeEventListener('keydown', documentKeyPressHandler);
+    }
+  };
+
+  var documentKeyPressHandler = function (evt) {
+    if (evt.keyCode === window.util.ESC_CODE) {
+      removeCard();
+      window.map.changeActivePin(pin);
+      showedCard = false;
+      document.removeEventListener('keydown', documentKeyPressHandler);
     }
   };
 
@@ -36,15 +45,6 @@
     removeCard();
     window.map.changeActivePin(pin);
     showedCard = false;
-  };
-
-  var documentKeyPressHandler = function (evt) {
-    if (evt.keyCode === window.util.ESC_CODE) {
-      removeCard();
-      window.map.changeActivePin(pin);
-      showedCard = false;
-      document.removeEventListener('keypress', documentKeyPressHandler);
-    }
   };
 
   var putFeaturesToCard = function (estate, featuresNode) {
@@ -99,8 +99,11 @@
     popupCard = document.querySelector('.map__card');
 
     cross = popupCard.querySelector('.popup__close');
+
+
     cross.addEventListener('click', crossClickHandler);
-    document.addEventListener('keypress', documentKeyPressHandler);
+
+    document.addEventListener('keydown', documentKeyPressHandler);
 
     templateCardImg = popupCard.querySelector('.popup__photos img');
 

@@ -23,6 +23,9 @@
 
   var onError = function (errorMessage) {
     viewMessage('#error', '.error', errorMessage);
+    window.form.disableForm();
+    window.map.setMainPinDefault();
+    makeListenerToLoad();
   };
 
   var makeListenerToLoad = function () {
@@ -60,15 +63,15 @@
     var documentKeyPressHandler = function (evt) {
       if (evt.keyCode === window.util.ESC_CODE) {
         sendMessage.remove();
-        document.removeEventListener('keypress', documentKeyPressHandler);
+        document.removeEventListener('keydown', documentKeyPressHandler);
       }
     };
 
-    document.addEventListener('keypress', documentKeyPressHandler);
+    document.addEventListener('keydown', documentKeyPressHandler);
 
     sendMessage.addEventListener('click', function () {
       sendMessage.remove();
-      document.removeEventListener('keypress', documentKeyPressHandler);
+      document.removeEventListener('keydown', documentKeyPressHandler);
     });
   };
 

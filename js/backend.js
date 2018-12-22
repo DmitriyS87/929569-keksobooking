@@ -1,7 +1,7 @@
 'use strict';
 
 (function () {
-  var LOAD_TIMEOUT = 20000;
+  var LOAD_TIMEOUT = 3000;
   var LOAD_URL = 'https://js.dump.academy/keksobooking/data';
   var SAVE_URL = 'https://js.dump.academy/keksobooking';
 
@@ -29,9 +29,9 @@
   var makeServerRequest = function (onLoad, onError, method, URL, data) {
     var SUCCESS_CODE = 200;
     var ERROR_CODE = {
-      400: 'Неверный запрос к серверу. Сообщите администратору сайта о проблеме при запросе данных от сервера',
-      401: 'Недостаточно прав для выполнения запроса на сервер! Пройдите авторизацию.',
-      404: 'Ошибка при загрузке данных! Запрашиваемая инфомрация не найдена.',
+      400: 'Неверный запрос к серверу. Сообщите администратору сайта о проблеме при запросе данных от сервера. 400',
+      401: 'Недостаточно прав для выполнения запроса на сервер! Пройдите авторизацию. 401',
+      404: 'Ошибка при загрузке данных! Запрашиваемая инфомрация не найдена. 404',
     };
 
     var xhr = createXhr(onError);
@@ -58,7 +58,7 @@
     };
 
     var responseErrorHandler = function () {
-      onError('Серевер вернул ошибку при обработке запроса');
+      onError('Серевер вернул неизвестную ошибку при обработке запроса');
     };
 
     var responseAbortHandler = function () {
