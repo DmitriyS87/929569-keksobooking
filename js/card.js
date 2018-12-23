@@ -49,27 +49,12 @@
 
   var putFeaturesToCard = function (estate, featuresNode) {
     var fragmentLU = document.createDocumentFragment();
-    var cloneFeature = featuresNode.cloneNode(true);
-    var nodeFeatures = cloneFeature.childNodes;
-
-    var estateFeaturesCount = 0;
-    for (var i = 1; i < nodeFeatures.length; i++) {
-      if (nodeFeatures[i].tagName === 'LI') {
-        var feature = (window.util.getSubString(nodeFeatures[i].getAttribute('class'), '-').slice(1));
-        if (estate.offer.features.some(function (item) {
-          return feature === item;
-        })) {
-          fragmentLU.appendChild(nodeFeatures[i].cloneNode(true));
-          fragmentLU.appendChild(nodeFeatures[i - 1].cloneNode(true));
-          estateFeaturesCount++;
-          if (estateFeaturesCount === estate.offer.features.length) {
-            break;
-          }
-        }
-      }
-    }
-
-
+    var separator = featuresNode.firstChild;
+    estate.offer.features.forEach(function (featureName) {
+      var feature = featuresNode.querySelector('.popup__feature--' + featureName);
+      fragmentLU.appendChild(feature);
+      fragmentLU.appendChild(separator.cloneNode(true));
+    });
     window.util.removeChildren(document.querySelector('.popup__features'));
     document.querySelector('.popup__features').appendChild(fragmentLU);
   };
