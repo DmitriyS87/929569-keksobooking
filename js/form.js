@@ -155,9 +155,44 @@
       estateTypeSelect.removeEventListener('change', changePrice);
       checkInTimeSelect.removeEventListener('change', synchronizeCheckOut);
       checkOutTimeSelect.removeEventListener('change', synchronizeCheckIn);
+      avatarPhotoinput.removeEventListener('change', avatarPhotoChangeHandler);
+      estatePhotoinput.removeEventListener('change', estatePhotoChangeHandler);
     };
 
     resetButton.addEventListener('click', resetClickHandler);
+
+    var avatarPhotoinput = document.querySelector('.ad-form__field input');
+    var avatarPreview = document.querySelector('.ad-form-header__preview img');
+
+    console.log(avatarPhotoinput);
+    console.log(avatarPreview);
+
+    var avatarPhotoChangeHandler = function () {
+      window.previewImage.makePreview(avatarPhotoinput, avatarPreview);
+    };
+
+    avatarPhotoinput.addEventListener('change', avatarPhotoChangeHandler);
+
+    var estatePhotoinput = document.querySelector('.ad-form__field input');
+    var estatePreview = document.querySelector('.ad-form-header__preview img');
+
+    console.log(estatePhotoinput);
+    console.log(estatePreview);
+
+    var makeEstatePhotoPreview = function () {
+      var div = document.querySelector('.ad-form__photo').cloneNode();
+      div.innerHTML = '<img src="" alt="Фото">';
+      var fragment = document.createDocumentFragment();
+      fragment.appendChild(div);
+
+    };
+
+    var estatePhotoChangeHandler = function () {
+      makeEstatePhotoPreview();
+      window.previewImage.makePreview(estatePhotoinput, estatePreview);
+    };
+
+    estatePhotoinput.addEventListener('change', estatePhotoChangeHandler);
 
   };
 
