@@ -1,12 +1,13 @@
 'use strict';
 
 (function () {
-  var debounceTime = 500;
-  var lastTimeout;
+  var DEBOUNCE_TIME = 500;
   var MIDDLE_PRICE = 10000;
   var HIGH_PRICE = 50000;
 
   var incomingEstates = [];
+  var lastTimeout;
+  var checkboxesChecked = [];
 
   var selectorsCount = {
     'type': 'any',
@@ -15,7 +16,6 @@
     'guests': 'any',
   };
 
-  var checkboxesChecked = [];
 
   var checkType = function (estate) {
     var key = 'type';
@@ -97,7 +97,7 @@
     }
     lastTimeout = window.setTimeout(function () {
       applyFilter(incomingEstates);
-    }, debounceTime);
+    }, DEBOUNCE_TIME);
   };
 
   var activateFilters = function (estates) {

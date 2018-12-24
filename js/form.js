@@ -2,11 +2,18 @@
 
 (function () {
 
-  var inputFormCSS = '.ad-form';
-  var addressCSS = '#address';
+  var INPUT_FORM_CSS = '.ad-form';
+  var ADDRESS_CSS = '#address';
+
+  var minPriceMap = {
+    'Квартира': 1000,
+    'Бунгало': 0,
+    'Дом': 5000,
+    'Дворец': 10000
+  };
 
   var putLocationAddress = function (address) {
-    document.querySelector(addressCSS).value = address;
+    document.querySelector(ADDRESS_CSS).value = address;
   };
 
 
@@ -29,9 +36,9 @@
     [].forEach.call(elementsFieldset, function (element) {
       setElementDisabled(element);
     });
-    document.querySelector(inputFormCSS).classList.add('ad-form--disabled');
+    document.querySelector(INPUT_FORM_CSS).classList.add('ad-form--disabled');
     document.querySelector('.map').classList.add('map--faded');
-    document.querySelector(addressCSS).value = [window.map.sizeMainPin.defaultX, window.map.sizeMainPin.defaultY];
+    document.querySelector(ADDRESS_CSS).value = [window.map.sizeMainPin.defaultX, window.map.sizeMainPin.defaultY];
 
   };
 
@@ -40,13 +47,6 @@
     var minPrice = minPriceMap[document.querySelector('#type option:checked').textContent];
     estatePriceInput.min = minPrice;
     estatePriceInput.placeholder = minPrice;
-  };
-
-  var minPriceMap = {
-    'Квартира': 1000,
-    'Бунгало': 0,
-    'Дом': 5000,
-    'Дворец': 10000
   };
 
   var activateForm = function () {
@@ -132,12 +132,12 @@
 
     var submitData = function (evt) {
       evt.preventDefault();
-      var data = new FormData(document.querySelector(inputFormCSS));
+      var data = new FormData(document.querySelector(INPUT_FORM_CSS));
       window.backend.save(onLoad, onError, data);
       return false;
     };
 
-    var dataForm = document.querySelector(inputFormCSS);
+    var dataForm = document.querySelector(INPUT_FORM_CSS);
     dataForm.classList.remove('ad-form--disabled');
 
     dataForm.addEventListener('submit', submitData);
@@ -145,7 +145,7 @@
     var resetButton = document.querySelector('.ad-form__reset');
 
     var resetClickHandler = function () {
-      document.querySelector(inputFormCSS).reset();
+      document.querySelector(INPUT_FORM_CSS).reset();
       dataForm.addEventListener('reset', resetFormData);
       window.init.setDefaultPage();
       dataForm.removeEventListener('submit', submitData);
