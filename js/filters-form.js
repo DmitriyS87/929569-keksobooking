@@ -16,7 +16,6 @@
     'guests': 'any',
   };
 
-
   var checkType = function (estate) {
     var key = 'type';
     if (selectorsCount[key] === 'any') {
@@ -63,14 +62,16 @@
   };
 
   var checkFeatures = function (estate) {
-    for (var i = 0; i < checkboxesChecked.length; i++) {
-
+    var result = true;
+    [].forEach.call(checkboxesChecked, function (checkboxChecked) {
       var featuresCondition = estate.offer.features.some(function (item) {
-        return item === checkboxesChecked[i];
+        return item === checkboxChecked;
       });
-      return featuresCondition;
-    }
-    return true;
+      if (!featuresCondition) {
+        result = false;
+      }
+    });
+    return result;
   };
 
   var isAppliedEstate = function (estate) {
@@ -115,16 +116,17 @@
     };
 
 
-    for (var i = 0; i < elements.length; i++) {
-      var elementType = elements[i].type.toLowerCase();
+    [].forEach.call(elements, function (element) {
+      var elementType = element.type.toLowerCase();
       if (elementType === 'select-one') {
-        var selector = elements[i];
+        var selector = element;
         selector.addEventListener('change', selectorChangeHandler);
       } else if (elementType === 'checkbox') {
-        var checkBox = elements[i];
+        var checkBox = element;
         checkBox.addEventListener('change', checkboxChangeHandler);
       }
-    }
+    });
+
   };
 
 

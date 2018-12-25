@@ -44,6 +44,7 @@
     window.map.removeMapPins();
     window.map.setMainPinDefault();
     window.form.disableForm();
+    window.form.deletePhotos();
     window.card.removeCard();
     window.filtersForm.resetFilters();
     makeListenerToLoad();

@@ -2,15 +2,17 @@
 
 (function () {
 
+  var ESTATE_PHOTO_WIDTH = 70;
+  var ESTATE_PHOTO_HEIGHT = 70;
+
   var INPUT_FORM_CSS = '.ad-form';
   var ADDRESS_CSS = '#address';
 
-  var minPriceMap = {
-    'Квартира': 1000,
-    'Бунгало': 0,
-    'Дом': 5000,
-    'Дворец': 10000
-  };
+  var DEFAULT_AVATAR_SRC = 'img/muffin-grey.svg';
+
+  var defaultContainer = document.querySelector('.ad-form__photo').cloneNode(true);
+  var estatePhotoContainer = document.querySelector('.ad-form__photo-container');
+  var avatarPreview = document.querySelector('.ad-form-header__preview img');
 
   var putLocationAddress = function (address) {
     document.querySelector(ADDRESS_CSS).value = address;
@@ -49,8 +51,23 @@
     estatePriceInput.placeholder = minPrice;
   };
 
-  var activateForm = function () {
+  var minPriceMap = {
+    'Квартира': 1000,
+    'Бунгало': 0,
+    'Дом': 5000,
+    'Дворец': 10000
+  };
 
+  var deletePhotos = function () {
+    var estatePreviewContainers = document.querySelectorAll('.ad-form__photo');
+    [].forEach.call(estatePreviewContainers, function (block) {
+      block.remove();
+    });
+    estatePhotoContainer.appendChild(defaultContainer);
+    avatarPreview.src = DEFAULT_AVATAR_SRC;
+  };
+
+  var activateForm = function () {
     var capacity = document.querySelector('#capacity');
 
     var guestsByRoomsMap = {
@@ -155,9 +172,45 @@
       estateTypeSelect.removeEventListener('change', changePrice);
       checkInTimeSelect.removeEventListener('change', synchronizeCheckOut);
       checkOutTimeSelect.removeEventListener('change', synchronizeCheckIn);
+      avatarPhotoinput.removeEventListener('change', avatarPhotoChangeHandler);
+      estatePhotoinput.removeEventListener('change', estatePhotoChangeHandler);
     };
 
     resetButton.addEventListener('click', resetClickHandler);
+
+    var avatarPhotoinput = document.querySelector('.ad-form__field input');
+
+    var avatarPhotoChangeHandler = function () {
+      window.inputImage.makePreview(avatarPhotoinput, avatarPreview);
+    };
+
+    avatarPhotoinput.addEventListener('change', avatarPhotoChangeHandler);
+
+    var estatePhotoinput = document.querySelector('.ad-form__upload input');
+
+    var makePreviewPhotoContainer = function () {
+      var div = defaultContainer.cloneNode();
+      div.innerHTML = '<img src="" alt="Фото вашего объявления" width=' + ESTATE_PHOTO_WIDTH + 'px height=' + ESTATE_PHOTO_HEIGHT + 'px >';
+      var fragment = document.createDocumentFragment();
+      fragment.appendChild(div);
+      estatePhotoContainer.insertBefore(fragment, estatePhotoContainer.children[1]);
+
+      var imageClickHandler = function (evt) {
+        if (evt.target.tagName === 'IMG') {
+          window.photoViewer.showFullScreen(evt.target);
+        }
+      };
+
+      estatePhotoContainer.children[1].addEventListener('click', imageClickHandler);
+    };
+
+    var estatePhotoChangeHandler = function () {
+      makePreviewPhotoContainer();
+      var estatePreview = document.querySelector('.ad-form__photo img');
+      window.inputImage.makePreview(estatePhotoinput, estatePreview);
+    };
+
+    estatePhotoinput.addEventListener('change', estatePhotoChangeHandler);
 
   };
 
@@ -177,5 +230,6 @@
     putLocationAddress: putLocationAddress,
     disableForm: disableForm,
     activateForm: activateForm,
+    deletePhotos: deletePhotos
   };
 })();
