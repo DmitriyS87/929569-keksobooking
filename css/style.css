@@ -814,6 +814,8 @@ fieldset {
 
   background-color: #e4e4de;
   border-radius: 5px;
+
+  text-align: center;
 }
 
 .ad-form__element--submit {
@@ -1162,9 +1164,9 @@ fieldset {
 
 
 /**
- * Блок увеличенной фотографии текущего объекта недвижимости
+ * увеличение фотографии на весь экран
  */
-.card_photo {
+.full_screen_photo {
   position: fixed;
   top: 0;
   left: 0;
@@ -1175,17 +1177,26 @@ fieldset {
 
   width: 100%;
   height: 100%;
-  overflow: auto;
+  overflow: hidden;
 
   padding-top: 80px;
+  padding-bottom: 80px;
 
   text-align: center;
   vertical-align: middle;
 
   background-color: rgba(0, 0, 0, 0.8);
 }
+.ad-form__photo img,
+.full_screen_photo img {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
 
-
+  text-align: center;
+  vertical-align: middle;
+}
 
 
 /**

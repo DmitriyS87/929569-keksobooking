@@ -2,8 +2,17 @@
 
 (function () {
 
+  var ESTATE_PHOTO_WIDTH = 70;
+  var ESTATE_PHOTO_HEIGHT = 70;
+
   var inputFormCSS = '.ad-form';
   var addressCSS = '#address';
+
+  var DEFAULT_AVATAR_SRC = 'img/muffin-grey.svg';
+
+  var defaultContainer = document.querySelector('.ad-form__photo').cloneNode(true);
+  var estatePhotoContainer = document.querySelector('.ad-form__photo-container');
+  var avatarPreview = document.querySelector('.ad-form-header__preview img');
 
   var putLocationAddress = function (address) {
     document.querySelector(addressCSS).value = address;
@@ -49,8 +58,16 @@
     'Дворец': 10000
   };
 
-  var activateForm = function () {
+  var deletePhotos = function () {
+    var estatePreviewContainers = document.querySelectorAll('.ad-form__photo');
+    [].forEach.call(estatePreviewContainers, function (block) {
+      block.remove();
+    });
+    estatePhotoContainer.appendChild(defaultContainer);
+    avatarPreview.src = DEFAULT_AVATAR_SRC;
+  };
 
+  var activateForm = function () {
     var capacity = document.querySelector('#capacity');
 
     var guestsByRoomsMap = {
@@ -162,34 +179,35 @@
     resetButton.addEventListener('click', resetClickHandler);
 
     var avatarPhotoinput = document.querySelector('.ad-form__field input');
-    var avatarPreview = document.querySelector('.ad-form-header__preview img');
-
-    console.log(avatarPhotoinput);
-    console.log(avatarPreview);
 
     var avatarPhotoChangeHandler = function () {
-      window.previewImage.makePreview(avatarPhotoinput, avatarPreview);
+      window.inputImage.makePreview(avatarPhotoinput, avatarPreview);
     };
 
     avatarPhotoinput.addEventListener('change', avatarPhotoChangeHandler);
 
-    var estatePhotoinput = document.querySelector('.ad-form__field input');
-    var estatePreview = document.querySelector('.ad-form-header__preview img');
+    var estatePhotoinput = document.querySelector('.ad-form__upload input');
 
-    console.log(estatePhotoinput);
-    console.log(estatePreview);
-
-    var makeEstatePhotoPreview = function () {
-      var div = document.querySelector('.ad-form__photo').cloneNode();
-      div.innerHTML = '<img src="" alt="Фото">';
+    var makePreviewPhotoContainer = function () {
+      var div = defaultContainer.cloneNode();
+      div.innerHTML = '<img src="" alt="Фото вашего объявления" width=' + ESTATE_PHOTO_WIDTH + 'px height=' + ESTATE_PHOTO_HEIGHT + 'px >';
       var fragment = document.createDocumentFragment();
       fragment.appendChild(div);
+      estatePhotoContainer.insertBefore(fragment, estatePhotoContainer.children[1]);
 
+      var imageClickHandler = function (evt) {
+        if (evt.target.tagName === 'IMG') {
+          window.photoViewer.showFullScreen(evt.target);
+        }
+      };
+
+      estatePhotoContainer.children[1].addEventListener('click', imageClickHandler);
     };
 
     var estatePhotoChangeHandler = function () {
-      makeEstatePhotoPreview();
-      window.previewImage.makePreview(estatePhotoinput, estatePreview);
+      makePreviewPhotoContainer();
+      var estatePreview = document.querySelector('.ad-form__photo img');
+      window.inputImage.makePreview(estatePhotoinput, estatePreview);
     };
 
     estatePhotoinput.addEventListener('change', estatePhotoChangeHandler);
@@ -212,5 +230,6 @@
     putLocationAddress: putLocationAddress,
     disableForm: disableForm,
     activateForm: activateForm,
+    deletePhotos: deletePhotos
   };
 })();

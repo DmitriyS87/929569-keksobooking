@@ -1,12 +1,13 @@
 'use strict';
 
 (function () {
-  var debounceTime = 500;
-  var lastTimeout;
+  var DEBOUNCE_TIME = 500;
   var MIDDLE_PRICE = 10000;
   var HIGH_PRICE = 50000;
 
   var incomingEstates = [];
+  var lastTimeout;
+  var checkboxesChecked = [];
 
   var selectorsCount = {
     'type': 'any',
@@ -14,8 +15,6 @@
     'rooms': 'any',
     'guests': 'any',
   };
-
-  var checkboxesChecked = [];
 
   var checkType = function (estate) {
     var key = 'type';
@@ -63,14 +62,16 @@
   };
 
   var checkFeatures = function (estate) {
-    for (var i = 0; i < checkboxesChecked.length; i++) {
-
+    var result = true;
+    [].forEach.call(checkboxesChecked, function (checkboxChecked) {
       var featuresCondition = estate.offer.features.some(function (item) {
-        return item === checkboxesChecked[i];
+        return item === checkboxChecked;
       });
-      return featuresCondition;
-    }
-    return true;
+      if (!featuresCondition) {
+        result = false;
+      }
+    });
+    return result;
   };
 
   var isAppliedEstate = function (estate) {
@@ -97,7 +98,7 @@
     }
     lastTimeout = window.setTimeout(function () {
       applyFilter(incomingEstates);
-    }, debounceTime);
+    }, DEBOUNCE_TIME);
   };
 
   var activateFilters = function (estates) {
@@ -115,16 +116,17 @@
     };
 
 
-    for (var i = 0; i < elements.length; i++) {
-      var elementType = elements[i].type.toLowerCase();
+    [].forEach.call(elements, function (element) {
+      var elementType = element.type.toLowerCase();
       if (elementType === 'select-one') {
-        var selector = elements[i];
+        var selector = element;
         selector.addEventListener('change', selectorChangeHandler);
       } else if (elementType === 'checkbox') {
-        var checkBox = elements[i];
+        var checkBox = element;
         checkBox.addEventListener('change', checkboxChangeHandler);
       }
-    }
+    });
+
   };
 
 

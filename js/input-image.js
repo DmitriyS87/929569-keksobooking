@@ -21,7 +21,7 @@
       reader.readAsDataURL(file);
     }
   };
-  window.previewImage = {
+  window.inputImage = {
     makePreview: makePreview
   };
 
